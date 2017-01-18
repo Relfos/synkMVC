@@ -1,0 +1,99 @@
+<script>
+
+function saveEntity(id, className)
+{
+	var form = $('#data_form');
+	form.validator();
+	form.on('submit', function (e) {
+		if (e.isDefaultPrevented()) 
+		{
+			return;
+		} 		
+		
+		e.preventDefault();
+		
+		var fields = '';
+		{{#grid.headers}}
+			fields = fields + '{{name}},';			
+		{{/grid.headers}}	  
+		
+		//alert(fields);
+		crmNavigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
+	});
+	
+	form.submit();
+}
+
+function deleteEntity(id, className)
+{
+	bootbox.confirm("Não será possivél voltar atrás. Tem a certeza que quer apagar esta entidade?", function(val)
+	{
+		if (val == true)
+		{
+			crmNavigate('current', 'delete', 'id='+id+'&class='+className);
+		}		
+	});
+
+	
+}
+</script>
+
+{{#grid.rows}}
+<form role="form" id="data_form">
+{{#columns}}
+	<div class="form-group form_row">
+		<label for="{{name}}" class="control-label">{{label}}</label>
+
+		{{#entity}}
+			<input class="hidden" type="text" id="{{name}}" value="{{entityID}}">
+			
+			<input id="{{name}}_search" class="form-control" value="{{value}}"> <br>
+			
+			<script> 			
+			$( "#{{name}}_search" ).autocomplete({
+				source: 'index.php?module={{module.name}}&action=json&class={{entity}}',
+				minLength: 2,
+				select: function( event, ui ) {
+					event.preventDefault();
+					//alert( "Selected: " + ui.item.value + " aka " + ui.item.label );
+					
+					var item = ui.item;
+					if (item.label == 'Nenhum')
+					{
+						item.label = '-';
+					}
+					$("#{{name}}_search").val(item.label);
+					$("#{{name}}").val(item.value);
+				  }
+				});			
+			</script>
+		{{/entity}}
+		
+		{{^entity}}
+			{{#options.0}}
+				<select class="form-control" id="{{name}}">
+				{{#options}}
+					<option value='{{value}}'>{{key}}</option>
+				{{/options}}	  					  
+				</select>		
+			{{/options.0}}			
+			
+			{{^options.0}}
+			<{{control}} type="{{type}}" class="form-control" name="{{name}}" id="{{name}}" {{^hasContent}}value="{{value}}"{{/hasContent}} 
+			rows=3 {{#required}}required data-required-error="Este campo é obrigatório."{{/required}}>{{#hasContent}}{{value}}{{/hasContent}}</{{control}}> <br>
+			{{/options.0}}
+		{{/entity}}
+		
+		<div class="help-block with-errors"></div>
+		
+	</div>
+{{/columns }}	
+
+	<div class="form-group">
+		<button type="button" class="btn btn-primary" onclick="saveEntity({{rowID}}, '{{class}}')">Guardar</button>
+		<button type="button" class="btn btn-primary" onclick="crmNavigate('current', 'render')">Cancelar</button>
+		<button type="button" class="btn btn-primary" onclick="deleteEntity({{rowID}}, '{{class}}')">Apagar</button>
+	</div>
+</form>
+{{/grid.rows}}
+

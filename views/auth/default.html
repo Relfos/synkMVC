@@ -1,0 +1,17 @@
+<h4>Introduza os seus dados de acesso</h4>
+<div class="hline"></div>
+	{{#warning}}
+	<p class="error">{{warning}}</p>
+	{{/warning}}
+<br>
+	<form role="form" action="#">
+	  <div class="form-group">
+		<label for="InputEmail1">Email address</label>
+		<input type="email" class="form-control" id="email" value="admin@synkdata.com">
+	  </div>
+	  <div class="form-group">
+		<label for="InputSubject1">Password</label>
+		<input type="password" class="form-control" id="password">
+	  </div>
+	  <button type="button" class="btn btn-theme" onclick="crmNavigate('current', 'login',  gather('email,password'))">Login</button>
+	</form>

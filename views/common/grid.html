@@ -1,0 +1,97 @@
+<div class="table-responsive">
+	<table class="table table-hover">
+	 <thead>
+	  <tr>
+		{{#grid.headers}}
+			{{#visible}}
+			<th>{{label}}</th>
+			{{/visible}}
+		{{/grid.headers}}	  
+	  </tr>
+	 </thead>	 
+ 
+	 <tbody>
+		{{#grid.rows}}
+		  <tr>
+			{{#columns}}
+				{{#visible}}
+				<td>{{value}}</td>
+				{{/visible}}
+			{{/columns }}	
+
+			<td><a href="#" onclick="crmNavigate('current', 'edit', 'id={{rowID}}')" class="btn btn-theme small_btn">Editar</a></td>
+		  </tr>
+		{{/grid.rows}}
+	 
+	 </tbody>
+	</table>
+</div>
+
+<form role="form" id="data_form">
+<button type="button" class="btn btn-primary" onclick="crmNavigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#searchModal">Filtrar</button>
+{{#filter}}
+<button type="button" class="btn btn-primary" onclick="crmNavigate('current', 'unfilter')">Limpar</button>
+{{/filter}}
+</form>
+
+<script>
+
+function searchEntity()
+{
+	$('#searchModal').one('hidden.bs.modal', function(){
+		crmNavigate('current', 'filter', 'class={{module.entity}}&'+gather('field_name,field_value'));
+	}).modal('hide');	
+}
+
+</script>
+
+<!-- Modal -->
+<div id="searchModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{module.title}} - Pesquisa</h4>
+      </div>
+      <div class="modal-body">
+		
+		<p>Some text in the modal.</p>
+		<form role="form" id="search_form">
+			<div class="col-xs-6">
+				<div class="form-group form_row">
+					<label for="field_name" class="control-label">Campo</label>
+					
+					<select class="form-control" id="field_name">
+				{{#grid.headers}}
+					<option value='{{name}}'>{{label}}</option>
+				{{/grid.headers}}	  					  
+					</select>				
+					
+					<div class="help-block with-errors"></div>
+				</div>
+			</div>
+			
+			<div class="col-xs-6">
+				<div class="form-group form_row">
+					<label for="field_value" class="control-label">Valor</label>
+					
+					<input type="text" class="form-control" id="field_value" placeholder="Insira um valor">
+    					
+					<div class="help-block with-errors"></div>
+				</div>
+			</div>
+			
+		</form>
+        
+      </div>
+      <div class="modal-footer">
+	  <button type="button" class="btn btn-primary" onclick="searchEntity()">Pesquisar</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+
+  </div>
+</div>

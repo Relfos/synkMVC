@@ -1,0 +1,211 @@
+<?php
+
+class Context {
+    public $hasLogin = false;  
+	public $entityID = null;
+
+	function __construct() {
+		$this->hasLogin = isset($_SESSION['user_id']);		
+		
+		$this->config = new Config();
+		
+		if ($this->hasLogin)
+		{
+			$databaseName = $this->loadVar('user_db', '');	
+			$this->sql = new SQL($this->config);
+			$this->sql->query('CREATE DATABASE IF NOT EXISTS '.$databaseName);
+			$this->sql->selectDatabase($databaseName);
+			
+			$this->sql->query("CREATE TABLE IF NOT EXISTS enums (
+			`name` VARCHAR(30) NOT NULL,
+			`values` TEXT NOT NULL,
+			PRIMARY KEY (`name`)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+			
+			$result = $this->sql->query("SELECT count(*) as total FROM enums;");
+			$row = $this->sql->fetchRow($result);
+			if ($row['total'] == '0')
+			{
+				$this->createEnum('product_types', array('Produto', 'Serviço', 'Outro'));
+			}			
+			
+		}			
+		
+		$this->loadModules();
+		
+		$module = $this->loadVar('module', 'auth');
+		$this->changeModule($module);
+		
+		$view = $this->loadVar('view', $this->module->defaultAction);
+		$this->changeView($view);		
+		
+		$this->filter = $this->loadVar('filter', null);
+	}
+	
+	function loadModules()
+	{
+		$this->modules = array ();
+		$this->createModule('auth')->setTitle('Login');
+		$this->createModule('dashboard')->setTitle('Dashboard')->requireAuth();
+		$this->createModule('clients')->setTitle('Clientes')->requireAuth()->setDefaultAction('grid')->setEntity('client');
+		$this->createModule('users')->setTitle('Utilizadores')->requireAuth()->setDefaultAction('grid')->setEntity('user');
+		$this->createModule('categories')->setTitle('Categorias')->requireAuth()->setDefaultAction('grid')->setEntity('category');
+		$this->createModule('products')->setTitle('Produtos')->requireAuth()->setDefaultAction('grid')->setEntity('product');	
+	}
+
+
+	function createModule($name) {	
+		$module = new Module($name);
+		$this->modules[$name] = $module;
+		
+		return $module;
+	}
+	
+	function createEnum($name, $valuesArray)
+	{
+		$values = '';
+		foreach($valuesArray as $val) {
+			if (strlen($values)>0)
+			{
+				$values .= '|';
+			}
+			
+			$values .= $val;
+		}
+		$this->sql->query("INSERT INTO enums (`name`, `values`) VALUES ('$name', '$values')");			
+	}
+	
+	function fetchEnum($name)
+	{
+		$row = $this->sql->fetchSingleRow("SELECT `values` FROM enums WHERE `name` = '$name'");			
+		$temp  = $row['values'];
+		$names = explode("|", $temp);			
+		
+		$values = array();
+		
+		$i = 0;
+		foreach($names as $name) {
+			$entry = array( 'key' => $name, 'value' => $name, 'index' => $i);			
+			$values[] = $entry;
+			$i++;
+		}		
+		return $values;
+	}
+	
+	function kill($error)
+	{
+		echo $error;
+		die();
+	}
+	
+	function changeModule($module)
+	{
+		$modules = $this->modules;
+
+		if (array_key_exists($module, $modules))
+		{
+			$this->module = $modules[$module];		
+		}
+		else
+		{
+			die("Could not load module: ".$module);
+			return;
+		}
+		
+		$_SESSION['module'] = $module;
+		$this->curModule = $module;
+			
+		
+		$this->changeView($this->module->defaultAction);
+	}
+
+	function changeView($view)
+	{
+		$_SESSION['view'] = $view;
+		$this->curView = $view;
+	}
+
+	function logIn($user_id, $user_db)
+	{
+		$_SESSION['user_id'] = $user_id;
+		$_SESSION['user_db'] = $user_db;
+		$this->hasLogin = true;
+	}
+
+	function logOut()
+	{
+		unset($_SESSION['user_id']);
+		unset($_SESSION['user_db']);
+		session_destroy();
+		$this->hasLogin = false;
+	}
+	
+	function reload()
+	{
+		echo "[RELOAD]";
+	}
+
+	function loadVar($name, $defaultValue)
+	{
+		if (isset($_REQUEST[$name]))
+		{
+			$result = $_REQUEST[$name];	
+			
+			if (strcmp($result, 'current') !=0)
+			{
+				return $result;	
+			}			
+		}
+
+		if (isset($_SESSION[$name]))
+		{
+			return $_SESSION[$name];	
+		}
+
+		return $defaultValue;
+	}
+
+	function loadVarFromSession($name, $defaultValue)
+	{
+		if (isset($_SESSION[$name]))
+		{
+			return $_SESSION[$name];	
+		}
+
+		return $defaultValue;
+	}
+
+	function loadVarFromRequest($name, $defaultValue)
+	{
+		if (isset($_REQUEST[$name]))
+		{
+			return $_REQUEST[$name];	
+		}
+
+		return $defaultValue;
+	}
+
+	function addFilter($filter)
+	{
+		if (is_null($this->filter))
+		{
+			$this->filter = $filter;	
+		}
+		else
+		{
+			$this->filter .= ' AND '. $filter;	
+		}
+		
+		$_SESSION['filter'] = $this->filter;
+	}
+
+	function removeFilters()
+	{
+		unset($_SESSION['filter']);
+		$this->filter = null;
+	}
+	
+}
+
+
+?>

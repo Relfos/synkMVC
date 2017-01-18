@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="assets/ico/favicon.ico">
+
+    <title>SynkCRM</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="assets/css/bootstrap.css" rel="stylesheet">
+
+	<link href="assets/css/morris.css" rel="stylesheet">
+	
+    <!-- Custom styles for this template -->
+    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+	
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>	
+	
+	<script src="assets/js/bootstrap.min.js"></script>
+	<script src="assets/js/retina-1.1.0.js"></script>
+	<script src="assets/js/jquery.hoverdir.js"></script>
+	<script src="assets/js/jquery.hoverex.min.js"></script>
+  	<script src="assets/js/jquery.isotope.min.js"></script>
+	<script src="assets/js/validator.min.js"></script>
+	<script src="assets/js/bootbox.min.js"></script>	
+	<script src="assets/js/raphael.min.js"></script>	
+	<script src="assets/js/morris.min.js"></script>	
+	    
+  </head>
+
+	<body>
+<script>
+function gather(argList)
+{
+	var args = '';
+	var s = argList.split(",");
+	var i;
+	for (i=0; i<s.length; i++)
+	{
+		var e = document.getElementById(s[i]);
+		
+		if (s[i].length<=0)
+		{
+			continue;
+		}
+		
+		if (args.length>0)
+		{
+			args = args +'&';
+		}
+		
+		args = args + s[i]+'=';
+		if (e)
+		{			
+			var val;
+		
+		//alert(s[i] + ' = '+ e.type.toLowerCase());
+			if (e.type.toLowerCase() == 'select')
+			{
+				val = e.selectedIndex;
+			}
+			else
+			{
+				val = e.value;
+			}
+			
+			args = args + encodeURIComponent(val);
+		}
+	}
+		
+	return args;
+}
+
+function crmNavigate(module, action, otherArgs)
+{
+	if (!action)
+	{
+		action = 'render';
+	}
+	
+	var args = 'module='+module+'&action='+action;
+		
+	if (otherArgs)
+	{
+		args = args + '&'+otherArgs;
+	}
+		
+	$.ajax({
+	url: 'index.php?'+args,
+	type:'GET',
+	success: function(data){		
+		if (data == '[RELOAD]')
+		{
+			location.reload(); 
+		}
+		else
+		{
+			$('#body_content').html(data);
+		}
+	}
+	});	
+}
+</script>
+	
+    <!-- Fixed navbar -->
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#"><img src="assets/img/logo.png" /></a>
+        </div>
+        <div class="navbar-collapse collapse navbar-right">
+          <ul class="nav navbar-nav">';
+		
+{{#hasLogin}}
+            <!--<li><a href="index.html">HOME</a></li>
+            <li class="active"><a href="about.html">ABOUT</a></li>             -->
+            
+			<li><a href="#" onclick="crmNavigate('dashboard')">Dashboard</a></li>
+			
+			<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Modulos <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" onclick="crmNavigate('clients')">Clientes</a></li>
+				<li><a href="#" onclick="crmNavigate('categories')">Categorias</a></li>
+                <li><a href="#" onclick="crmNavigate('products')">Produtos</a></li>
+                <li><a href="#" onclick="crmNavigate('documents')">Documentos</a></li>
+              </ul>
+            </li>
+			
+			<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Admin <b class="caret"></b></a>
+              <ul class="dropdown-menu">
+                <li><a href="#" onclick="crmNavigate('users')">Utilizadores</a></li>
+				<li><a href="#" onclick="crmNavigate('company')">Empresa</a></li>
+                <li><a href="#" onclick="crmNavigate('config')">Configuração</a></li>
+              </ul>
+            </li>
+			
+			<li><a href="#" onclick="crmNavigate('auth','logout')">Sair</a></li>
+{{/hasLogin}}		
+
+			</ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	<div id="blue">
+	    <div class="container">
+			<div class="row">
+				<h3>{{module.title}}</h3>
+			</div><!-- /row -->
+	    </div> <!-- /container -->
+	</div><!-- /blue -->
+
+	 <div class="container mtb">
+	 	<div class="row"> 		
+	 		<div class="col-lg-12" id="body_content">
+			$body
+	 		</div>
+	 	</div><! --/row -->
+	 </div><! --/container -->
+
+	 <div id="footerwrap">
+	 	<div class="container">
+		 	<div class="row">
+		 		<div class="col-lg-4">
+		 			<h4>About Synkdata</h4>
+		 			<div class="hline-w"></div>
+		 			<p>A modern convenient approach to integrate all your business needs, for teams of all sizes.</p>
+		 		</div>
+		 		<div class="col-lg-4">
+		 			<h4>Social Links</h4>
+		 			<div class="hline-w"></div>
+		 			<p>
+		 				<a href="#"><i class="fa fa-dribbble"></i></a>
+		 				<a href="#"><i class="fa fa-facebook"></i></a>
+		 				<a href="#"><i class="fa fa-twitter"></i></a>
+		 				<a href="#"><i class="fa fa-instagram"></i></a>
+		 				<a href="#"><i class="fa fa-tumblr"></i></a>
+		 			</p>
+		 		</div>
+		 		<div class="col-lg-4">
+		 			<h4>Contacto</h4>
+		 			<div class="hline-w"></div>
+		 			<p>
+		 				Avenida das Peras, 987,<br/>
+		 				23890, Lisboa,<br/>
+		 				Portugal.<br/>
+		 			</p>
+		 		</div>
+		 	
+		 	</div><! --/row -->
+	 	</div><! --/container -->
+	 </div><! --/footerwrap -->
+	 	
+
+	</body>
+</html>
