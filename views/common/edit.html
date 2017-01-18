@@ -73,7 +73,7 @@ function deleteEntity(id, className)
 			{{#options.0}}
 				<select class="form-control" id="{{name}}">
 				{{#options}}
-					<option value='{{value}}'>{{key}}</option>
+					<option value='{{key}}' {{#selected}}selected="selected"{{/selected}}>{{value}}</option>
 				{{/options}}	  					  
 				</select>		
 			{{/options.0}}			

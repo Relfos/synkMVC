@@ -141,12 +141,14 @@ class Field
 	function asEmail()
 	{
 		$this->formType = 'email';
+		$this->defaultValue = 'Portugal';
 		return $this->asString(40);
 	}
 
 	function asCountry()
-	{
-		return $this->asString(20);
+	{		
+		$this->asEnum('countries');
+		return $this;
 	}
 
 	function asURL()

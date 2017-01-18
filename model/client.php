@@ -7,7 +7,7 @@ class Client extends Entity {
 		$this->registerField('address')->asText()->setLabel('Morada');
 		$this->registerField('city')->asString(20)->showInGrid()->setLabel('Cidade');
 		$this->registerField('zip_code')->asString(8)->setLabel('Código Postal');
-		$this->registerField('country')->asCountry()->setLabel('País');
+		$this->registerField('country')->asCountry()->showInGrid()->setLabel('País');
 		$this->registerField('email')->asEmail()->makeOptional()->showInGrid()->setLabel('Email');
 		$this->registerField('website')->asURL()->makeOptional()->setLabel('Website');
 		$this->registerField('phone')->asPhone()->makeOptional()->showInGrid()->setLabel('Telefone');

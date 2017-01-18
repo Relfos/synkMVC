@@ -118,6 +118,14 @@ class Controller {
 				if (!is_null($field->enum))
 				{
 					$options = $context->fetchEnum($field->enum);
+					$opLen = count($options);
+					for ($n=0; $n<$opLen; $n++)
+					{
+						if ($options[$n]['key'] == $fieldValue || $options[$n]['value'] == $fieldValue)
+						{
+							$options[$n]['selected'] = true;
+						}
+					}
 				}
 				else
 				{

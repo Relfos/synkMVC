@@ -22,6 +22,7 @@ class Context {
 			$this->sql->query("CREATE TABLE IF NOT EXISTS enums (
 			`name` VARCHAR(30) NOT NULL,
 			`values` TEXT NOT NULL,
+			`keys` TEXT NOT NULL,
 			PRIMARY KEY (`name`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 			
@@ -30,6 +31,9 @@ class Context {
 			if ($row['total'] == '0')
 			{
 				$this->createEnum('product_types', array('Produto', 'Serviço', 'Outro'));
+
+				require_once ('countries.php');
+				createCountriesEnum($this);
 			}					
 		}			
 		
@@ -129,28 +133,48 @@ class Context {
 	function createEnum($name, $valuesArray)
 	{
 		$values = '';
+		$keys = '';
+		$i = 0;
 		foreach($valuesArray as $val) {
+			
+			if (is_array($val))
+			{
+				$value = $val['value'];
+				$key = $val['key'];
+			}
+			else
+			{
+				$value = $val;
+				$key = $i;				
+			}
+			
 			if (strlen($values)>0)
 			{
 				$values .= '|';
+				$keys .= '|';
 			}
 			
-			$values .= $val;
+			$values .= $value;
+			$keys .= $key;
+			$i++;
 		}
-		$this->sql->query("INSERT INTO enums (`name`, `values`) VALUES ('$name', '$values')");			
+		$this->sql->query("INSERT INTO enums (`name`, `values`, `keys`) VALUES ('$name', '$values', '$keys')");			
 	}
 	
 	function fetchEnum($name)
 	{
-		$row = $this->sql->fetchSingleRow("SELECT `values` FROM enums WHERE `name` = '$name'");			
+		$row = $this->sql->fetchSingleRow("SELECT `values`, `keys` FROM enums WHERE `name` = '$name'");			
 		$temp  = $row['values'];
 		$names = explode("|", $temp);			
 		
+		$temp  = $row['keys'];
+		$keys = explode("|", $temp);			
+
 		$values = array();
 		
 		$i = 0;
 		foreach($names as $name) {
-			$entry = array( 'key' => $name, 'value' => $name, 'index' => $i);			
+			$entry = array( 'key' => $keys[$i], 'value' => $name, 'index' => $i);			
 			$values[] = $entry;
 			$i++;
 		}		
