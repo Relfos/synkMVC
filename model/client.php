@@ -13,7 +13,7 @@ class Client extends Entity {
 		$this->registerField('phone')->asPhone()->makeOptional()->showInGrid()->setLabel('Telefone');
 		$this->registerField('fax')->asPhone()->makeOptional()->setLabel('Fax');
 		$this->registerField('notes')->asText()->makeOptional()->setLabel('Notas');
-		$this->registerField('discount')->asFloat()->makeOptional()->setLabel('Desconto');
+		$this->registerField('discount')->asPercent()->makeOptional()->setLabel('Desconto');
 		$this->registerField('document_copies')->asInt()->makeOptional()->setLabel('Cópias de Documento');
 		$this->registerField('payment_day')->asInt()->makeOptional()->setLabel('Dia de Pagamento');
 		//$this->registerField('maturity_date')->makeOptional();

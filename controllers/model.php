@@ -68,7 +68,7 @@ class ModelController extends BaseController {
 	
 	public function save($context)
 	{	
-		//var_dump ($_REQUEST); die();
+		var_dump ($_REQUEST); die();
 	
 		$id = $_REQUEST['id'];
 		$entityClass = $_REQUEST['class'];

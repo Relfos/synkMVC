@@ -35,6 +35,7 @@
 	<script src="assets/js/jquery.hoverdir.js"></script>
 	<script src="assets/js/jquery.hoverex.min.js"></script>
   	<script src="assets/js/jquery.isotope.min.js"></script>
+	<script src="assets/js/autonumeric.js"></script>
 	<script src="assets/js/validator.min.js"></script>
 	<script src="assets/js/bootbox.min.js"></script>	
 	<script src="assets/js/raphael.min.js"></script>	
@@ -50,9 +51,7 @@ function gather(argList)
 	var s = argList.split(",");
 	var i;
 	for (i=0; i<s.length; i++)
-	{
-		var e = document.getElementById(s[i]);
-		
+	{			
 		if (s[i].length<=0)
 		{
 			continue;
@@ -64,22 +63,23 @@ function gather(argList)
 		}
 		
 		args = args + s[i]+'=';
-		if (e)
-		{			
-			var val;
+		var val;
 		
-		//alert(s[i] + ' = '+ e.type.toLowerCase());
-			if (e.type.toLowerCase() == 'select')
-			{
-				val = e.selectedIndex;
-			}
-			else
-			{
-				val = e.value;
-			}
-			
+		var element = $("#"+s[i]);
+		try {
+			val = element.autoNumeric("get");
+			val = val.replace('.00', '');
+		}
+		catch(err) 
+		{
+			val = element.val();
+		}
+
+		if (val)
+		{
 			args = args + encodeURIComponent(val);
 		}
+		
 	}
 		
 	return args;

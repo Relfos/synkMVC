@@ -13,6 +13,7 @@ class Field
 	public $hidden = false;
 	public $enum = null;
 	public $entity = null;
+	public $unit = null;
 	
 	function __construct($name) {
 		$this->name = $name;
@@ -57,12 +58,24 @@ class Field
 		$this->formType = 'number';
 		return $this;
 	}
-
+	
 	function asFloat()
 	{
 		$this->dbType = 'float';
 		$this->defaultValue = '0';
 		return $this;
+	}
+
+	function asPercent()
+	{
+		$this->unit = '%';		
+		return $this->asFloat();
+	}
+
+	function asMoney()
+	{
+		$this->unit = '€';
+		return $this->asFloat();
 	}
 
 	function asString($maxLength)

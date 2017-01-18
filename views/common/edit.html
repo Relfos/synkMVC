@@ -82,6 +82,16 @@ function deleteEntity(id, className)
 			<{{control}} type="{{type}}" class="form-control" name="{{name}}" id="{{name}}" {{^hasContent}}value="{{value}}"{{/hasContent}} 
 			rows=3 {{#required}}required data-required-error="Este campo é obrigatório."{{/required}}>{{#hasContent}}{{value}}{{/hasContent}}</{{control}}> <br>
 			{{/options.0}}
+			
+			{{#unit}}
+			<script>
+			$("#{{name}}").autoNumeric("init", {
+				aSep: '.',
+				aDec: ',', 
+				aSign: '{{unit}} '
+			});
+			</script>
+			{{/unit}}
 		{{/entity}}
 		
 		<div class="help-block with-errors"></div>

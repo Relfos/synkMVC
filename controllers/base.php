@@ -139,6 +139,7 @@ class BaseController {
 					'odd' => $odd,
 					'entity' => $field->entity,
 					'entityID' => $entityID,
+					'unit' => $field->unit,
 					'hasContent' => $hasContent
 					);
 					
