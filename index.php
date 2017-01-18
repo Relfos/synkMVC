@@ -13,41 +13,21 @@ require_once('core/context.php');
 require_once('core/sql.php');
 require_once('core/database.php');
 require_once('core/entity.php');
-require_once ("core/modules.php");
+require_once ("core/module.php");
 
 $context = new Context();
-$context->database = new Database($context->config);
 
-function executeAction($context, $action)
-{
-	$controllerFile = 'controllers/'.$context->curModule.'.php';
-	if (!file_exists($controllerFile))
-	{
-		echo "Could not find controller file for  ".$context->curModule;
-		return;
-	}
-	
-	require_once ($controllerFile);
+$context->createModule('auth')->setTitle('Login');
+$context->createModule('dashboard')->setTitle('Dashboard')->requireAuth();
+$context->createModule('clients')->setTitle('Clientes')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('client');
+$context->createModule('users')->setTitle('Utilizadores')->setMenu('Admin')->requireAuth()->setDefaultAction('grid')->setEntity('user');
+$context->createModule('categories')->setTitle('Categorias')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('category');
+$context->createModule('products')->setTitle('Produtos')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('product');	
 
-	$controllerClass = ucfirst($context->curModule)."Controller";
-	
-	if (!class_exists($controllerClass, false))
-	{
-		echo "Could not find controller class for ".$context->curModule;
-		return;
-	}
-	
-	$controller = new $controllerClass;
+$context->createModule('company')->setTitle('Empresa')->setMenu('Admin')->requireAuth();
+$context->createModule('settings')->setTitle('Configuração')->setMenu('Admin')->requireAuth();
 
-	if (is_callable(array($controller, $action)))
-	{
-		$controller->$action($context);
-	}
-	else
-	{
-		echo "Invalid action $action on controller ".$context->curModule;
-	}
-}
+$context->prepare();
 
 $action = $context->loadVarFromRequest('action', 'page');
 
@@ -60,6 +40,7 @@ if (strcmp($action, 'page') === 0) {
 
 require ('controllers/base.php');
 require ('controllers/model.php');
-executeAction($context, $action);
+
+$context->execute($action);
 
 ?>

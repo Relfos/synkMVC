@@ -6,9 +6,10 @@ class Context {
 
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);		
+		$this->modules = array ();
 		
 		$this->config = new Config();
-		
+				
 		if ($this->hasLogin)
 		{
 			$databaseName = $this->loadVar('user_db', '');	
@@ -27,12 +28,14 @@ class Context {
 			if ($row['total'] == '0')
 			{
 				$this->createEnum('product_types', array('Produto', 'Serviço', 'Outro'));
-			}			
-			
+			}					
 		}			
 		
-		$this->loadModules();
-		
+		$this->database = new Database($this->config);
+	}
+	
+	public function prepare()
+	{			
 		$module = $this->loadVar('module', 'auth');
 		$this->changeModule($module);
 		
@@ -40,25 +43,85 @@ class Context {
 		$this->changeView($view);		
 		
 		$this->filter = $this->loadVar('filter', null);
+		
+		$this->loadMenus();
 	}
 	
-	function loadModules()
+	public function execute($action)
 	{
-		$this->modules = array ();
-		$this->createModule('auth')->setTitle('Login');
-		$this->createModule('dashboard')->setTitle('Dashboard')->requireAuth();
-		$this->createModule('clients')->setTitle('Clientes')->requireAuth()->setDefaultAction('grid')->setEntity('client');
-		$this->createModule('users')->setTitle('Utilizadores')->requireAuth()->setDefaultAction('grid')->setEntity('user');
-		$this->createModule('categories')->setTitle('Categorias')->requireAuth()->setDefaultAction('grid')->setEntity('category');
-		$this->createModule('products')->setTitle('Produtos')->requireAuth()->setDefaultAction('grid')->setEntity('product');	
+		$controllerFile = 'controllers/'.$this->curModule.'.php';
+		if (!file_exists($controllerFile))
+		{
+			echo "Could not find controller file for  ".$this->curModule;
+			return;
+		}
+		
+		require_once ($controllerFile);
+
+		$controllerClass = ucfirst($this->curModule)."Controller";
+		
+		if (!class_exists($controllerClass, false))
+		{
+			echo "Could not find controller class for ".$this->curModule;
+			return;
+		}
+		
+		$controller = new $controllerClass;
+
+		if (is_callable(array($controller, $action)))
+		{
+			$controller->$action($this);
+		}
+		else
+		{
+			echo "Invalid action $action on controller ".$this->curModule;
+		}
 	}
-
-
-	function createModule($name) {	
+	
+	public function createModule($name) {	
 		$module = new Module($name);
 		$this->modules[$name] = $module;
 		
 		return $module;
+	}
+	
+	private function findMenuIndex($name)
+	{
+		$i = 0;
+		foreach($this->menus as $menu) {
+			if (strcmp($menu['title'], $name) == 0)
+			{
+				return $i;
+			}
+			$i++;
+		}		
+		
+		$this->menus[] = array('title' => $name, 'items' => array());
+		return $i;
+	}
+	
+	function loadMenus()
+	{
+		$this->menus = array();
+		
+		$this->menus[] = array('title' => 'Dashboard', 'link' => "navigate('dashboard')");
+
+		foreach($this->modules as $module) 
+		{
+			if (is_null($module->menu))
+			{
+				continue;
+			}
+			
+			$link = $module->getLink();
+			if (is_null($link))
+			{
+				continue;
+			}
+			
+			$index = $this->findMenuIndex($module->menu);
+			$this->menus[$index]['items'][] = array('label' => $module->title, 'link' => $link);
+		}				
 	}
 	
 	function createEnum($name, $valuesArray)

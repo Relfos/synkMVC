@@ -7,6 +7,7 @@ class Module
 	public $needAuth = false;
 	public $defaultAction = 'default';
 	public $entity = null;
+	public $menu = null;
 	
 	function __construct($name) {
 		$this->name = $name;	
@@ -34,7 +35,17 @@ class Module
 		$this->entity = $entity;		
 		return $this;		
 	}
-	
+
+	public function setMenu($menu)
+	{
+		$this->menu = $menu;		
+		return $this;		
+	}
+
+	public function getLink()
+	{
+		return "navigate('".$this->name."')";
+	}
 }
 
 

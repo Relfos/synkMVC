@@ -19,7 +19,7 @@
 				{{/visible}}
 			{{/columns }}	
 
-			<td><a href="#" onclick="crmNavigate('current', 'edit', 'id={{rowID}}')" class="btn btn-theme small_btn">Editar</a></td>
+			<td><a href="#" onclick="navigate('current', 'edit', 'id={{rowID}}')" class="btn btn-theme small_btn">Editar</a></td>
 		  </tr>
 		{{/grid.rows}}
 	 
@@ -28,10 +28,10 @@
 </div>
 
 <form role="form" id="data_form">
-<button type="button" class="btn btn-primary" onclick="crmNavigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
+<button type="button" class="btn btn-primary" onclick="navigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#searchModal">Filtrar</button>
 {{#filter}}
-<button type="button" class="btn btn-primary" onclick="crmNavigate('current', 'unfilter')">Limpar</button>
+<button type="button" class="btn btn-primary" onclick="navigate('current', 'unfilter')">Limpar</button>
 {{/filter}}
 </form>
 
@@ -40,7 +40,7 @@
 function searchEntity()
 {
 	$('#searchModal').one('hidden.bs.modal', function(){
-		crmNavigate('current', 'filter', 'class={{module.entity}}&'+gather('field_name,field_value'));
+		navigate('current', 'filter', 'class={{module.entity}}&'+gather('field_name,field_value'));
 	}).modal('hide');	
 }
 

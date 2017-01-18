@@ -18,7 +18,7 @@ function saveEntity(id, className)
 		{{/grid.headers}}	  
 		
 		//alert(fields);
-		crmNavigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
+		navigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
 	});
 	
 	form.submit();
@@ -30,7 +30,7 @@ function deleteEntity(id, className)
 	{
 		if (val == true)
 		{
-			crmNavigate('current', 'delete', 'id='+id+'&class='+className);
+			navigate('current', 'delete', 'id='+id+'&class='+className);
 		}		
 	});
 
@@ -101,7 +101,7 @@ function deleteEntity(id, className)
 
 	<div class="form-group">
 		<button type="button" class="btn btn-primary" onclick="saveEntity({{rowID}}, '{{class}}')">Guardar</button>
-		<button type="button" class="btn btn-primary" onclick="crmNavigate('current', 'render')">Cancelar</button>
+		<button type="button" class="btn btn-primary" onclick="navigate('current', 'render')">Cancelar</button>
 		<button type="button" class="btn btn-primary" onclick="deleteEntity({{rowID}}, '{{class}}')">Apagar</button>
 	</div>
 </form>
