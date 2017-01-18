@@ -47,6 +47,7 @@ class Entity
 	{
 		$this->id = $row['id'];
 		$this->insertion_date = $row['insertion_date'];
+		
 		foreach($this->fields as $field) {
 			$fieldName = $field->name;
 			if (array_key_exists ($fieldName , $row ))
@@ -54,6 +55,23 @@ class Entity
 				$this->$fieldName = $row[$fieldName];
 			}
 		}		
+	}
+	
+	public function expand($context)
+	{
+		foreach($this->fields as $field) {
+			$fieldName = $field->name;			
+			
+			if ($field->formType == 'file')
+			{
+				$fieldData = $fieldName.'_thumb';				
+				$hash = $this->$fieldName;
+				$row = $context->sql->fetchSingleRow("SELECT thumb FROM uploads WHERE `hash` = '$hash'");	
+				$thumb = $row['thumb'];
+				//echo $hash; die();
+				$this->$fieldData = $thumb;
+			}
+		}				
 	}
 	
 	public function save($context)

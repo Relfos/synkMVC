@@ -47,7 +47,7 @@ function deleteEntity(id, className)
 		{{#entity}}
 			<input class="hidden" type="text" id="{{name}}" value="{{entityID}}">
 			
-			<input id="{{name}}_search" class="form-control" value="{{value}}"> <br>
+			<input id="{{name}}_search" class="form-control" value="{{value}}">
 			
 			<script> 			
 			$( "#{{name}}_search" ).autocomplete({
@@ -79,8 +79,41 @@ function deleteEntity(id, className)
 			{{/options.0}}			
 			
 			{{^options.0}}
-			<{{control}} type="{{type}}" class="form-control" name="{{name}}" id="{{name}}" {{^hasContent}}value="{{value}}"{{/hasContent}} 
-			rows=3 {{#required}}required data-required-error="Este campo é obrigatório."{{/required}}>{{#hasContent}}{{value}}{{/hasContent}}</{{control}}> <br>
+				{{#isUpload}}
+				<input class="hidden" type="text" id="{{name}}" value="{{value}}">
+				<div id="fileuploader">Upload</div>
+					{{#thumb}}
+					<img src="data:image/jpeg;base64,{{thumb}}" />
+					{{/thumb}}
+					<script>
+						$("#fileuploader").uploadFile({
+							url:"upload.php",
+							dataType: "json",
+							fileName:"target",
+							multiple:false,
+							maxFileCount:1,
+							formData: {"db":"{{databaseName}}"},
+							dragDropStr: "<span><b>Arraste para aqui ficheiros</b></span>",
+							extErrorStr:"não é permitido. Extensões permitidas:",
+							sizeErrorStr:"excedeu o limite permitido. Tamanho máximo:",
+							uploadErrorStr:"Upload não autorizado",
+							onSuccess:function(files,data,xhr,pd)
+							{
+								console.log(data);
+								data = $.parseJSON(data);
+								console.log(data);
+								data = data[0];
+								console.log(data);
+								$("#{{name}}").val(data.location);
+							}
+						});
+					</script>			
+				{{/isUpload}}
+				
+				{{^isUpload}}
+				<{{control}} type="{{type}}" class="form-control {{class}}" name="{{name}}" id="{{name}}" {{^hasContent}}value="{{value}}"{{/hasContent}} 
+				rows=3 {{#required}}required data-required-error="Este campo é obrigatório."{{/required}}>{{#hasContent}}{{value}}{{/hasContent}}</{{control}}>
+				{{/isUpload}}
 			{{/options.0}}
 			
 			{{#unit}}
@@ -93,7 +126,7 @@ function deleteEntity(id, className)
 			</script>
 			{{/unit}}
 		{{/entity}}
-		
+		<br>
 		<div class="help-block with-errors"></div>
 		
 	</div>
@@ -106,4 +139,3 @@ function deleteEntity(id, className)
 	</div>
 </form>
 {{/grid.rows}}
-

@@ -6,6 +6,7 @@ class Field
 	public $label;
 	public $dbType;
 	public $formType = 'text';
+	public $formClass = '';
 	public $controlType = 'input';
 	public $required = true;
 	public $defaultValue = '';
@@ -103,11 +104,18 @@ class Field
 	
 	function asFile()
 	{
-		$this->dbType = "mediumblob";
+		$this->dbType = "varchar(40)";		
 		$this->defaultValue = '';
+		$this->formType = 'file';
 		return $this;
 	}
 	
+	function asImage()
+	{
+		$this->asFile();
+		return $this;
+	}
+
 	function asTime()
 	{
 		$this->dbType = "int";

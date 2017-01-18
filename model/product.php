@@ -8,6 +8,7 @@ class Product extends Entity {
 		$this->registerField('reference')->asString(30)->showInGrid()->setLabel('Referência');
 		$this->registerField('description')->asText()->setLabel('Descrição')->makeOptional();
 		$this->registerField('price')->asMoney()->showInGrid()->setLabel('Preço');
+		$this->registerField('picture')->asImage()->showInGrid()->setLabel('Foto')->makeOptional();
 		
 		//$this->registerField('unit')->asEnum('product_units')->setLabel('Unidade');
 						

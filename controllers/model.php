@@ -1,6 +1,6 @@
 <?php
 
-class ModelController extends BaseController {
+class ModelController extends Controller {
 
 	function __construct()
 	{
@@ -66,9 +66,15 @@ class ModelController extends BaseController {
 	   $this->render($context);
 	}
 	
-	public function save($context)
-	{	
+	public function upload($context)
+	{
+		var_dump($_FILES);
 		var_dump ($_REQUEST); die();
+	}
+	
+	public function save($context)
+	{			
+		//var_dump ($_REQUEST); die();
 	
 		$id = $_REQUEST['id'];
 		$entityClass = $_REQUEST['class'];
@@ -76,7 +82,8 @@ class ModelController extends BaseController {
 		$entity = $context->database->fetchEntity($context, $entityClass, $id);
 	   
 		$row = $_REQUEST;
-		foreach($entity->fields as $field) {
+		foreach($entity->fields as $field) 
+		{
 			$fieldName = $field->name;
 			
 			if (array_key_exists ($fieldName , $row ))			
@@ -84,7 +91,6 @@ class ModelController extends BaseController {
 				$entity->$fieldName = $row[$fieldName];
 			}		
 		}
-	
 	
 		$entity->save($context);
 	   
@@ -96,8 +102,19 @@ class ModelController extends BaseController {
 	{
 		$entityClass = $_REQUEST['class'];
 		
+		if (isset($_REQUEST['term']))
+		{
+			$term = $_REQUEST['term'];
+			$condition = "name like '%".$term."%'";
+		}	
+		else
+		{
+			$condition = null;
+		}
+		
+		
 		echo '[';
-		$entities = $context->database->fetchAllEntities($context, $entityClass, null);	
+		$entities = $context->database->fetchAllEntities($context, $entityClass, $condition);	
 		$i = 0;
 		
 		if (!isset($_REQUEST['required']))

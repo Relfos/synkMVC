@@ -16,8 +16,11 @@
 	<link href="assets/css/morris.css" rel="stylesheet">
 	
     <!-- Custom styles for this template -->
-    <link href="assets/css/style.css" rel="stylesheet">
+    <link href="assets/css/style.css" rel="stylesheet">	
     <link href="assets/css/font-awesome.min.css" rel="stylesheet">
+	
+	<link href="assets/css/upload.css" rel="stylesheet">	
+	
 
 	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	
@@ -40,6 +43,7 @@
 	<script src="assets/js/bootbox.min.js"></script>	
 	<script src="assets/js/raphael.min.js"></script>	
 	<script src="assets/js/morris.min.js"></script>	
+	<script src="assets/js/upload.js"></script>	
 	    
   </head>
 
@@ -66,6 +70,15 @@ function gather(argList)
 		var val;
 		
 		var element = $("#"+s[i]);
+		
+		/*if (element.attr('type') == 'file')
+		{
+			alert('detectef file '+s[i]);
+			var file = document.getElementById('fileBox').files[0];
+			
+			//btoa()
+		}
+		*/
 		try {
 			val = element.autoNumeric("get");
 			val = val.replace('.00', '');
@@ -101,7 +114,7 @@ function navigate(module, action, otherArgs)
 		
 	$.ajax({
 	url: 'index.php?'+args,
-	type:'GET',
+	type:'POST',
 	success: function(data){		
 		if (data == '[RELOAD]')
 		{

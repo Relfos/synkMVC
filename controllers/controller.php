@@ -1,6 +1,6 @@
 <?php
 
-class BaseController {
+class Controller {
 
    function __construct()
    {
@@ -33,8 +33,7 @@ class BaseController {
 		{
 			$layoutTemplate = $moduleTemplate;
 		}
-		
-		
+				
 		if (strpos($layoutTemplate, '{{#grid.') !== false) {
 			$this->loadGrid($context);
 		}	   
@@ -69,7 +68,7 @@ class BaseController {
 		if ($context->entityID != null)
 		{
 			$entity = $context->database->fetchEntity($context, $entityClass, $context->entityID);	
-			
+								
 			$entities = array();
 			$entities[] = $entity;
 		}
@@ -93,8 +92,20 @@ class BaseController {
 				$fieldName = $field->name;
 				$fieldValue = $entity->$fieldName;
 				$required = $field->required;
-				$odd = ($i % 2) != 0;
+				$odd = ($i % 2) != 0;						
 				
+				if (strcmp($field->formType, 'file') == 0)
+				{
+					$isUpload = true;
+					$fieldData = $fieldName.'_thumb';
+					$thumb = $entity->$fieldData;
+				}
+				else
+				{
+					$isUpload = false;
+					$thumb = null;
+				}
+
 				if (strcmp($field->controlType, 'textarea') == 0)
 				{
 					$hasContent = true;
@@ -133,13 +144,16 @@ class BaseController {
 					'value' => $fieldValue, 
 					'visible' => $field->grid, 
 					'type' => $field->formType, 
+					'class' => $field->formClass, 
 					'control' => $field->controlType, 
 					'required' => $required,
 					'options' => $options,
 					'odd' => $odd,
 					'entity' => $field->entity,
 					'entityID' => $entityID,
+					'thumb' => $thumb,
 					'unit' => $field->unit,
+					'isUpload' => $isUpload,
 					'hasContent' => $hasContent
 					);
 					

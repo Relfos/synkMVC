@@ -5,9 +5,9 @@ class Database
 	function __construct($config) {
 		$sql = new SQL($config);
 		
-		$crmDB = $config->database;
-		$sql->query('CREATE DATABASE IF NOT EXISTS '.$crmDB);
-		$sql->selectDatabase($crmDB);
+		$dbName = $config->database;
+		$sql->query('CREATE DATABASE IF NOT EXISTS '.$dbName);
+		$sql->selectDatabase($dbName);
 		
 		$sql->query("CREATE TABLE IF NOT EXISTS users (
 		`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -36,7 +36,7 @@ class Database
 			
 			$user_hash = $this->getPasswordHash($user_pass);
 
-			$sql->query("INSERT INTO $crmDB.users (`name`, `hash`, `database`) VALUES ('$user_name', '$user_hash', '$user_db');");			
+			$sql->query("INSERT INTO $dbName.users (`name`, `hash`, `database`) VALUES ('$user_name', '$user_hash', '$user_db');");			
 		}			
 	}
 	
@@ -63,6 +63,7 @@ class Database
 		$row = $context->sql->fetchSingleRow($query);
 		
 		$entity->loadFromRow($row);
+		$entity->expand($context);
 		
 		return $entity;
     }
@@ -87,6 +88,7 @@ class Database
 		while ($row = $context->sql->fetchRow($result)) {
 			$entity = $this->createEntity($context, $name);
 			$entity->loadFromRow($row);
+			$entity->expand($context);
 			$entities[] = $entity;
 		}
 					

@@ -17,6 +17,8 @@ class Context {
 			$this->sql->query('CREATE DATABASE IF NOT EXISTS '.$databaseName);
 			$this->sql->selectDatabase($databaseName);
 			
+			$this->databaseName = $databaseName;
+			
 			$this->sql->query("CREATE TABLE IF NOT EXISTS enums (
 			`name` VARCHAR(30) NOT NULL,
 			`values` TEXT NOT NULL,

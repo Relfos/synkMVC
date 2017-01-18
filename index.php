@@ -23,8 +23,10 @@ $context->createModule('clients')->setTitle('Clientes')->setMenu('Modulos')->req
 $context->createModule('users')->setTitle('Utilizadores')->setMenu('Admin')->requireAuth()->setDefaultAction('grid')->setEntity('user');
 $context->createModule('categories')->setTitle('Categorias')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('category');
 $context->createModule('products')->setTitle('Produtos')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('product');	
+$context->createModule('documents')->setTitle('Documentos')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('document');
 
 $context->createModule('company')->setTitle('Empresa')->setMenu('Admin')->requireAuth();
+$context->createModule('connectors')->setTitle('Conectores')->setMenu('Admin')->requireAuth();
 $context->createModule('settings')->setTitle('Configuração')->setMenu('Admin')->requireAuth();
 
 $context->prepare();
@@ -38,7 +40,7 @@ if (strcmp($action, 'page') === 0) {
 
 }
 
-require ('controllers/base.php');
+require ('controllers/controller.php');
 require ('controllers/model.php');
 
 $context->execute($action);
