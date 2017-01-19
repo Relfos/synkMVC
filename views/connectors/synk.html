@@ -1,0 +1,12 @@
+<h4>Sincronização de dados</h4>
+<div class="hline"></div>
+<br>
+token {{controller.token}}<br>
+
+<div class="progress">
+  <div id='progress' class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%;"></div>
+</div>
+
+<script>
+waitThenNavigate('progress', 'current', 'synk');
+</script>

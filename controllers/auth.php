@@ -2,9 +2,9 @@
 
 class AuthController extends Controller {
 
-   function __construct()
+   function __construct($context)
    {
-	   parent::__construct();
+	   parent::__construct($context);
    }
 
 	public function checkPassword($password, $user_hash)

@@ -36,10 +36,10 @@
 </div>
 
 <form role="form" id="data_form">
-<button type="button" class="btn btn-primary" onclick="navigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#searchModal">Filtrar</button>
+<button type="button" class="btn btn-theme" onclick="navigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
+<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">Filtrar</button>
 {{#filter}}
-<button type="button" class="btn btn-primary" onclick="navigate('current', 'unfilter')">Limpar</button>
+<button type="button" class="btn btn-theme" onclick="navigate('current', 'unfilter')">Limpar</button>
 {{/filter}}
 </form>
 
@@ -96,8 +96,8 @@ function searchEntity()
         
       </div>
       <div class="modal-footer">
-	  <button type="button" class="btn btn-primary" onclick="searchEntity()">Pesquisar</button>
-        <button type="button" class="btn btn-primary" data-dismiss="modal">Fechar</button>
+	  <button type="button" class="btn btn-theme" onclick="searchEntity()">Pesquisar</button>
+        <button type="button" class="btn btn-theme" data-dismiss="modal">Fechar</button>
       </div>
     </div>
 

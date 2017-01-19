@@ -2,8 +2,23 @@
 
 class Controller {
 
-   function __construct()
+   function __construct($context)
    {
+   }
+   
+   public function progress($context)
+   {
+	   $progressFile  = "tmp/" . session_id() . ".bar";
+	   if (file_exists($progressFile))
+	   {
+			$progress = file_get_contents($progressFile);
+	   }
+	   else
+	   {
+		   $progress = 0;
+	   }
+	   
+	   echo $progress;
    }
 
    public function render($context)

@@ -66,10 +66,13 @@ class Entity
 			{
 				$fieldData = $fieldName.'_thumb';				
 				$hash = $this->$fieldName;
-				$row = $context->sql->fetchSingleRow("SELECT thumb FROM uploads WHERE `hash` = '$hash'");	
-				$thumb = $row['thumb'];
-				//echo $hash; die();
-				$this->$fieldData = $thumb;
+				if (strlen($hash)>0)
+				{
+					$row = $context->sql->fetchSingleRow("SELECT thumb FROM uploads WHERE `hash` = '$hash'");	
+					$thumb = $row['thumb'];
+					//echo $hash; die();
+					$this->$fieldData = $thumb;					
+				}
 			}
 		}				
 	}

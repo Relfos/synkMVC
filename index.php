@@ -4,10 +4,12 @@ Mustache_Autoloader::register();
 
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 //error_reporting(E_ERROR | E_PARSE);
+
 session_start();
 
 //echo 'session cleared!';session_destroy();die();
 
+require_once('core/utils.php');
 require_once('core/config.php');
 require_once('core/context.php');
 require_once('core/sql.php');

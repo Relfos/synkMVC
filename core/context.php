@@ -72,7 +72,8 @@ class Context {
 			return;
 		}
 		
-		$controller = new $controllerClass;
+		$controller = new $controllerClass($this);
+		$this->controller = $controller;
 
 		if (is_callable(array($controller, $action)))
 		{
@@ -292,6 +293,11 @@ class Context {
 	{
 		unset($_SESSION['filter']);
 		$this->filter = null;
+	}
+	
+	function log($text)
+	{
+		file_put_contents($this->config->logFile, "$text\n", FILE_APPEND | LOCK_EX);	
 	}
 	
 }

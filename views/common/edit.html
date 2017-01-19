@@ -87,7 +87,7 @@ function deleteEntity(id, className)
 					{{/thumb}}
 					<script>
 						$("#fileuploader").uploadFile({
-							url:"upload.php",
+							url:"core/upload.php",
 							dataType: "json",
 							fileName:"target",
 							multiple:false,
@@ -133,9 +133,9 @@ function deleteEntity(id, className)
 {{/columns }}	
 
 	<div class="form-group">
-		<button type="button" class="btn btn-primary" onclick="saveEntity({{rowID}}, '{{class}}')">Guardar</button>
-		<button type="button" class="btn btn-primary" onclick="navigate('current', 'render')">Cancelar</button>
-		<button type="button" class="btn btn-primary" onclick="deleteEntity({{rowID}}, '{{class}}')">Apagar</button>
+		<button type="button" class="btn btn-theme" onclick="saveEntity({{rowID}}, '{{class}}')">Guardar</button>
+		<button type="button" class="btn btn-theme" onclick="navigate('current', 'render')">Cancelar</button>
+		<button type="button" class="btn btn-theme" onclick="deleteEntity({{rowID}}, '{{class}}')">Apagar</button>
 	</div>
 </form>
 {{/grid.rows}}

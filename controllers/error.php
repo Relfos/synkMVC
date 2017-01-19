@@ -2,9 +2,9 @@
 
 class ErrorController extends Controller {
 
-   function __construct()
+   function __construct($context)
    {
-	   parent::__construct();
+	   parent::__construct($context);
    }
 
 } 

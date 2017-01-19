@@ -2,9 +2,9 @@
 
 class ModelController extends Controller {
 
-	function __construct()
+	function __construct($context)
 	{
-	   parent::__construct();
+	   parent::__construct($context);
 	   
 	   $className = get_class($this);
 	   $this->entityClass = strtolower(str_replace('Controller', '', $className));

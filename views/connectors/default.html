@@ -1,0 +1,21 @@
+<h4>Sincronização de dados</h4>
+<div class="hline"></div>
+	{{#warning}}
+	<p class="error">{{warning}}</p>
+	{{/warning}}
+<br>
+	<form role="form" action="#">
+	  <div class="form-group">
+		<label for="email">Email</label>
+		<input type="email" class="form-control" id="email" value="{{config.synk_user}}">
+	  </div>
+	  <div class="form-group">
+		<label for="password">Password</label>
+		<input type="password" class="form-control" id="password" value="{{config.synk_pass}}">
+	  </div>
+	  <div class="form-group">
+		<label for="company">Empresa</label>
+		<input type="text" class="form-control" id="company" value="{{config.synk_company}}">
+	  </div>
+	  <button type="button" class="btn btn-theme" onclick="navigate('current', 'login',  gather('email,password,company'))">Login</button>
+	</form>
