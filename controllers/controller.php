@@ -57,6 +57,16 @@ class Controller {
 		echo $m->render($layoutTemplate, $context);	   
    }
 
+   public function paginate($context)
+   {
+	   //var_dump($_REQUEST); die();
+	   
+	   $page = $_REQUEST['page'];
+	   $_SESSION['page'] = $page;
+	   $context->page = $page;
+	   
+	   $this->render($context);
+   }
 
    private function loadGrid($context)
    {
@@ -80,19 +90,23 @@ class Controller {
 
 		$rows = array();
 		
+		$itemsPerPage = 20;
+		$currentPage = $context->loadVar('page', '1');
 		if ($context->entityID != null)
 		{
 			$entity = $context->database->fetchEntityByID($context, $entityClass, $context->entityID);	
 								
 			$entities = array();
 			$entities[] = $entity;
+			
+			$total = 1;
 		}
 		else
-		{
-			$entities = $context->database->fetchAllEntities($context, $entityClass, $context->filter);	
+		{			
+			$total = $context->database->getEntityCount($context, $entityClass, $context->filter);							
+			$entities = $context->database->fetchAllEntities($context, $entityClass, $context->filter, array('page' => $currentPage, 'items' => $itemsPerPage));	
 		}
-		
-			
+					
 		foreach($entities as $entity) {
 			
 			$columns = array();
@@ -196,18 +210,25 @@ class Controller {
 			$rows[] = array('columns' => $columns, 'rowID' => $entity->id, 'class' => $entityClass);
 		}
 			
-						
+	
+		$totalPages = floor($total / $itemsPerPage);
+		$pages = array();
+		$pages[] = array("id" => '«', 'disabled'=> $currentPage <= 1); 
+		for ($j=1; $j<=$totalPages; $j++)
+		{
+			$pages[] = array("id" => $j, "selected" => $currentPage == $j, 'disabled'=> false);
+		}
+		$pages[] = array("id" => '»', 'disabled'=> $currentPage >= $totalPages);
+		
+		if (count($pages)<=2)
+		{
+			$pages = null;
+		}
+		
 		$grid = array (
 		  'headers' => $headers,		  
 		  'rows' => $rows,
-		  'pages' => array( 
-					array("id" => '«', 'disabled'=> true), 
-					array("id" => 1, 'disabled'=> false), 
-					array("id" => 2, 'disabled'=> false), 
-					array("id" => 3, "selected" => true, 'disabled'=> false), 
-					array("id" => 4, 'disabled'=> false),
-					array("id" => '»', 'disabled'=> false)
-					)
+		  'pages' => $pages
 		  );	   
 		  		
 		$context->grid = $grid;

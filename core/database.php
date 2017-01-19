@@ -75,8 +75,8 @@ class Database
 				
 		return $entity;
     }
-	
-    public function fetchAllEntities($context, $name, $condition) {
+		
+    public function fetchAllEntities($context, $name, $condition, $pagination) {
 		
 		$entities = array();
 				
@@ -91,6 +91,19 @@ class Database
 			$query .= " WHERE ".$condition;
 		}
 		
+		if (!is_null($pagination))
+		{
+			$items_per_page = $pagination['items'];
+			$page = intval($pagination['page']);
+			$page--;
+			if ($page<0) 
+			{				
+				$page = 0;
+			}
+			$offset = $page * $items_per_page;
+			$query .= " LIMIT $offset , $items_per_page";
+		}
+		
 		$result = $context->sql->query($query);
 		
 		while ($row = $context->sql->fetchRow($result)) {
@@ -103,6 +116,26 @@ class Database
 		return $entities;
     }
 	
+    public function getEntityCount($context, $name, $condition) 
+	{					
+		$templateEntity = $this->createEntity($context, $name);
+		$tableName =  $templateEntity->tableName;
+				
+		$query = "SELECT count(*) as total FROM ".$tableName;
+		if ($condition != null && strlen(condition)>0)
+		{
+			$query .= " WHERE ".$condition;
+		}
+		
+		$row = $context->sql->fetchSingleRow($query);
+		if (is_null($row))
+		{
+			return 0;
+		}
+		
+		return intval($row['total']);
+    }
+
 	function getPasswordHash($password)
 	{
 		if(!defined('CRYPT_MD5') || !constant('CRYPT_MD5')) {
