@@ -66,6 +66,19 @@ class ModelController extends Controller {
 	   $this->render($context);
 	}
 	
+	public function remove($context)
+	{
+		$id = $_REQUEST['id'];
+		$entityClass = $_REQUEST['class'];
+		//var_dump($_REQUEST); die();
+	   
+		$entity = $context->database->fetchEntityByID($context, $entityClass, $id);
+		$entity->remove($context);
+	   
+		$context->changeView('grid');
+		$this->render($context);
+	}
+
 	public function upload($context)
 	{
 		var_dump($_FILES);

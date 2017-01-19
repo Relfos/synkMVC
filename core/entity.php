@@ -131,8 +131,21 @@ class Entity
 			$context->sql->query($query);
 			
 			$this->exists = true;
-		}
+		}		
+	}
+	
+	public function remove($context)
+	{		
+		if ($this->exists)
+		{		
+			$tableName = $this->tableName;
 		
+			$query = "DELETE FROM $tableName WHERE id=".$this->id;	
+			$context->sql->query($query);
+			
+			$this->exists = false;
+			$this->id = 0;			
+		}
 	}
 	
     public function registerField($name) {
