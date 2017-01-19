@@ -40,28 +40,45 @@ class ConnectorsController extends Controller {
 	public function synk($context)
 	{
 		$progress = new ProgressBar();
-		$max = 6;
-		for ($i=0; $i<=$max; $i++)
-		{
-			$progress->update($i, $max);			
-			sleep(1);
-		}
 		
+		$total = 0;
+		$total += $this->retrieveEntities($context, $progress, array(
+				'route' => 'customers',
+				'entity' => 'client',
+				'key' => 'synk_nif_c',
+				'propmap' => array(
+						'email1' => 'email',
+						'website' => 'website',
+						'name' => 'name',
+						'synk_nif_c' => 'vat',
+						'billing_address_street' => 'address',
+						'billing_address_city' => 'city',
+						'billing_address_postalcode' => 'zip_code',
+						'country_code' => 'country',
+						'synk_discount_c' => 'discount'
+					),
+				'normalize' => array ('name' => true, 'city' => true, 'address'=> true)
+			));
+
+  
 		$context->changeView('result');
+		$context->importTotal = $total;
 		$this->render($context);
 	}
    
-    public function syncContent($context, $classname, $parent_id) {
-        $key_name = getKeyForContent($classname);
-        $apiname = getAPI_Endpoint($classname);
-        $desckeys = getMatchMap($classname);
+    public function retrieveEntities($context, $progress, $options) {
+        $apiname = $options['route'];
+		$entityClass = $options['entity'];
+		$propmap = $options['propmap'];
+		$normalize = $options['normalize'];
+		$prop_key = $options['key'];
 
         // get external content from server
         $url = "moloni/" . $apiname . "/getall";
 
-        if (isset($parent_id) && $parent_id !== false) {
+        /*if (isset($parent_id) && $parent_id !== false) {
             $url = appendArgument($url, 'id_cat', $parent_id);
-        }
+        }*/
 
         $content = $this->api_get($context, $url);
 
@@ -69,164 +86,49 @@ class ConnectorsController extends Controller {
             return false;
         }
 
-        $propmap = getPropertyMap($classname);
-        //var_dump($propmap);
+		$entity = $context->database->createEntity($context, $entityClass);
+		$field = $entity->findField($propmap[$prop_key]);
 
-        $translations = loadTranslations($classname, $propmap);
-
-        //var_dump($content);
-        // get internal content list
-        $content_bean = BeanFactory::getBean($classname);
-        $old_content = $content_bean->get_full_list();
-
-        $key_crm = $key_name;
-
-        $missing = array();
         $imported = array();
-        $exported = array();
-        $mapped = array();
-
-        $mapPair = getMapPairs($classname);
-        $map_internal = $mapPair[0];
-        $map_external = $mapPair[1];
-
-        // loop through all local content and add it to the exported array
-        $len = count($old_content);
-        for ($j = 0; $j < $len; $j++) {
-            $record = $old_content[$j];
-
-            if (isset($parent_id) && $parent_id !== false && strcmp($record->aos_product_category_id, $parent_id) != 0) {
-                continue;
-            }
-
-            if (!isset($record->id)) {
-                continue;
-            }
-
-            $obj = (object) [];
-            $obj->classname = $classname;
-            $obj->data = $record;
-            $obj->id = $record->id;
-            $obj->description = $this->getObjectDescription($obj, $desckeys, $translations);
-
-            // check if object has valid key, if yes, add it to exported array, otherwise add it to missing array
-            if (!isset($record->$key_crm) || strlen($record->$key_crm) <= 0) {
-                if (defined('SYNK_DEBUG')) {
-                    echo "MISS: " . $record->name . "<br>";
-                }
-
-                // weird hack, some empty objects appear sometimes...
-                if (strlen($obj->description) > 0) {
-                    $obj->missing = $key_crm;
-                    array_push($missing, $obj);
-                }
-
-                continue;
-            } else {
-                if (defined('SYNK_DEBUG')) {
-                    echo "CRM: " . $record->name . "<br>";
-                }
-
-                $exported[$record->$key_crm] = $obj;
-            }
-        }
-
-        // loop through all new content and search for matches
-        // any matches found are removed from exported array
-        // new content is added to imported array
-
+		
+        // loop through all new content 
         $len = count($content->data);
-        for ($i = 0; $i < $len; $i++) {
-            $obj = (object) [];
-            $obj->classname = $classname;
+        for ($i = 0; $i < $len; $i++) 
+		{
+			$progress->update($i, $len - 1);			
             $external_data = $content->data[$i];
-
             //var_dump($external_data);
-
-            if (defined('SYNK_DEBUG')) {
-                echo "SERVER: " . $external_data["name"] . "<br>";
-            }
-
-            //  if the content is already on the CRM, remove it from the exported array
-            if (array_key_exists($external_data->$key_crm, $exported)) {
-                unset($exported[$external_data->$key_crm]);
-                continue;
-            }
-
-            $record = (object) [];
-
-            foreach ($propmap as $prop_crm => $prop_external) {
-                if (isset($external_data->$prop_crm)) {
-                    $record->$prop_crm = urldecode($external_data->$prop_external);
-                }
-            }
-
-            //HACK!! The CRM code should fill this field automatically, but for some reason it is empty
-            $record->aos_product_category_id = $parent_id;
-
-            $obj->data = $record;
-            $obj->description = $this->getObjectDescription($obj, $desckeys, $translations);
-            $obj->id = create_guid();
-
-            if (isset($external_data->$map_external)) {
-                $obj->externalKey = $external_data->$map_external;
-            }
-
-            array_push($imported, $obj);
+			
+			if (!isset($external_data->$prop_key)) {
+				continue;
+			}
+				
+			$entityID = $external_data->$prop_key;
+			$condition = $propmap[$prop_key].' = '. $field->encodeValue($context, $entityID);
+			
+			$entity = $context->database->fetchEntity($context, $entityClass, $condition);
+						
+			if (!$entity->exists)
+			{
+				foreach ($propmap as $prop_external => $prop_internal) {
+					if (isset($external_data->$prop_external)) {
+						
+						$value = urldecode($external_data->$prop_external);
+						
+						if (array_key_exists ($prop_internal, $normalize))
+						{
+							$value = fixNameCase($value);							
+						}						
+						
+						$entity->$prop_internal = $value;
+					}
+				}
+				$entity->save($context);			
+				$imported[] = $entity;
+			}
         }
-
-        // loop through all missing matches and try pair them with imported objs
-        $merges = array();
-        $len = count($missing);
-        $matchmap = getMatchMap($classname);
-        $i = 0;
-        while ($i < $len) {
-            $matched = false;
-            $len2 = count($imported);
-            for ($j = 0; $j < $len2; $j++) {
-                if (contentMatch($missing[$i]->data, $imported[$j]->data, $matchmap)) {
-                    if (defined('SYNK_DEBUG')) {
-                        echo "MATCHED: " . $missing[$i]->data->name . "<br>";
-                    }
-
-                    // copy missing fields
-                    foreach ($propmap as $prop_crm => $prop_external) {
-                        if (isset($missing[$i]->data->$prop_crm) && strlen($missing[$i]->data->$prop_crm) > 0) {
-                            continue;
-                        }
-
-                        if (!isset($imported[$j]->data->$prop_crm) || strlen($imported[$j]->data->$prop_crm) <= 0) {
-                            continue;
-                        }
-
-                        $missing[$i]->data->$prop_crm = $imported[$j]->data->$prop_crm;
-                    }
-
-                    array_push($merges, $missing[$i]);
-
-                    array_splice($missing, $i, 1);
-                    array_splice($imported, $j, 1);
-
-                    $matched = true;
-                    break;
-                }
-            }
-
-            if ($matched) {
-                $len--;
-            } else {
-                $i++;
-            }
-        }
-
-        $result = array();
-        $result["missing"] = $missing;
-        $result["merges"] = $merges;
-        $result["exported"] = $exported;
-        $result["imported"] = $imported;
-        $result["mapped"] = $mapped;
-
-        return $result;
+		
+		return count($imported);
     }
    
 	public function setToken($token)

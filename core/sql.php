@@ -11,6 +11,8 @@ class SQL
 		{
 			die($this->db->error);
 		}					
+		
+		mb_internal_encoding('UTF-8');
 	}
 	
 	function selectDatabase($name)
@@ -37,7 +39,7 @@ class SQL
 	
 	public function fetchRow($result)
 	{
-		if (empty($result))	return false;
+		if (empty($result))	return null;
 
 		$row = mysqli_fetch_assoc($result);
 		return $row;
@@ -47,9 +49,19 @@ class SQL
 	{
 		$query .= ' LIMIT 1';
 		$result = $this->query($query);
-		return $this->fetchRow($result);
+		$row = $this->fetchRow($result);
+		if ($row === false)
+		{
+			return null;
+		}
+		
+		return $row;
 	}
 	
+	public function escapeString($val)
+	{
+		return mysqli_real_escape_string($this->db, $val);
+	}
 }
 
 

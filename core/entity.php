@@ -2,12 +2,15 @@
 
 require_once('field.php');
 
+$entity_init = array();
+
 class Entity
 {
 	public $id = 0;
 	public $insertion_date = 0;
 	public $tableName = '';
 	public $fields = array();
+	public $exists = false;
 	
 	function __construct($context) {
 		$className = get_class($this);
@@ -30,21 +33,32 @@ class Entity
 			$query .= "`$fieldName` $fieldType NOT NULL, ";			
 		}
 		
+		global $entity_init;
+		
 		if (!$customTable)
 		{
-			$query = "CREATE TABLE IF NOT EXISTS $tableName (
-				`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-				`insertion_date` int(10) unsigned NOT NULL,
-				$query
-				PRIMARY KEY (`id`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-	
-			$context->sql->query($query);			
+			if (!array_key_exists ($className, $entity_init))
+			{
+				$entity_init[$className] = true;
+				$query = "CREATE TABLE IF NOT EXISTS $tableName (
+					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+					`insertion_date` int(10) unsigned NOT NULL,
+					$query
+					PRIMARY KEY (`id`)
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+			
+				$context->sql->query($query);							
+			}
 		}
 	}
 	
 	public function loadFromRow($row)
 	{
+		if (is_null($row))
+		{
+			return;
+		}
+		
 		$this->id = $row['id'];
 		$this->insertion_date = $row['insertion_date'];
 		
@@ -55,6 +69,8 @@ class Entity
 				$this->$fieldName = $row[$fieldName];
 			}
 		}		
+		
+		$this->exists = true;
 	}
 	
 	public function expand($context)
@@ -88,7 +104,7 @@ class Entity
 		foreach($this->fields as $field) {
 			$fieldName = $field->name;
 			$fieldType = $field->dbType;	
-			$fieldValue = $field->encodeValue($this->$fieldName);
+			$fieldValue = $field->encodeValue($context, $this->$fieldName);
 									
 			if ($i>0)
 			{
@@ -104,15 +120,17 @@ class Entity
 			$i++;
 		}
 
-		if ($this->id == 0)
-		{
-			$query = "INSERT INTO $tableName ($fieldList) VALUES($valueList)";	
-			$context->sql->query($query);
-		}
-		else
+		if ($this->exists)
 		{
 			$query = "UPDATE $tableName SET $query WHERE id=".$this->id;	
 			$context->sql->query($query);
+		}
+		else
+		{			
+			$query = "INSERT INTO $tableName ($fieldList) VALUES($valueList)";	
+			$context->sql->query($query);
+			
+			$this->exists = true;
 		}
 		
 	}

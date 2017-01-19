@@ -48,23 +48,31 @@ class Database
 		return $result;
 	}
 	
-    public function fetchEntity($context, $name, $id) {
-		
+	public function fetchEntityByID($context, $name, $id) 
+	{
+		return $this->fetchEntity($context, $name, "id=$id");
+	}
+	
+    public function fetchEntity($context, $name, $condition)
+	{	
 		$entity = $this->createEntity($context, $name);
 		
-		if ($id <= 0)
+		if (is_null($condition))
 		{
 			return $entity;
 		}
 
 		$tableName = $entity->tableName;
-		$query = "SELECT * FROM ".$tableName." WHERE id=$id";
+		$query = "SELECT * FROM ".$tableName." WHERE $condition";
 
 		$row = $context->sql->fetchSingleRow($query);
 		
-		$entity->loadFromRow($row);
-		$entity->expand($context);
-		
+		if (!is_null($row))
+		{
+			$entity->loadFromRow($row);
+			$entity->expand($context);
+		}
+				
 		return $entity;
     }
 	

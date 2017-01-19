@@ -48,7 +48,14 @@ class Context {
 		$view = $this->loadVar('view', $this->module->defaultAction);
 		$this->changeView($view);		
 		
-		$this->filter = $this->loadVar('filter', null);
+		if ($this->module->needAuth && !$this->hasLogin)
+		{
+			$this->changeModule('auth');
+		}
+		else
+		{
+			$this->filter = $this->loadVar('filter', null);	
+		}			
 		
 		$this->loadMenus();
 	}

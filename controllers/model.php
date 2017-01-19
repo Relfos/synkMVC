@@ -28,7 +28,7 @@ class ModelController extends Controller {
 		}
 		else
 		{
-			$fieldValue = $field->encodeValue($fieldValue);
+			$fieldValue = $field->encodeValue($context, $fieldValue);
 			
 			
 			if (strpos($fieldValue, '*') !== false) 
@@ -79,7 +79,7 @@ class ModelController extends Controller {
 		$id = $_REQUEST['id'];
 		$entityClass = $_REQUEST['class'];
 	   
-		$entity = $context->database->fetchEntity($context, $entityClass, $id);
+		$entity = $context->database->fetchEntityByID($context, $entityClass, $id);
 	   
 		$row = $_REQUEST;
 		foreach($entity->fields as $field) 

@@ -10,6 +10,35 @@ function appendArgument($url, $name, $value) {
     return $url . $name . '=' . urlencode($value);
 }
 
+
+function fixNameCase($name)
+{
+	if (strlen($name) <= 0)
+	{
+		return $name;
+	}
+
+	$splitters = array(' ','.',"'",'-'); 
+	
+	$fixed = '';
+	$blank = str_replace($splitters, '?', $name);
+	$n = explode('?', $blank);
+	
+	foreach($n as $f) 
+	{
+		$fixed .= ucfirst(mb_strtolower($f)).' ';
+	}
+	
+	for ($i=0;$i<strlen($fixed);$i++) {
+		if ($fixed[$i]==' ') {
+			if ($blank[$i]=='?') {
+				$fixed[$i] = $name[$i];
+			}
+		}
+	}
+	return substr_replace($fixed,'', -1);		
+}
+
 class ProgressBar
 {
 	function __construct()

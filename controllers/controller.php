@@ -82,7 +82,7 @@ class Controller {
 		
 		if ($context->entityID != null)
 		{
-			$entity = $context->database->fetchEntity($context, $entityClass, $context->entityID);	
+			$entity = $context->database->fetchEntityByID($context, $entityClass, $context->entityID);	
 								
 			$entities = array();
 			$entities[] = $entity;
@@ -106,6 +106,7 @@ class Controller {
 
 				$fieldName = $field->name;
 				$fieldValue = $entity->$fieldName;
+				$maskedValue = $fieldValue;
 				$required = $field->required;
 				$odd = ($i % 2) != 0;						
 				
@@ -136,11 +137,19 @@ class Controller {
 					$opLen = count($options);
 					for ($n=0; $n<$opLen; $n++)
 					{
-						if ($options[$n]['key'] == $fieldValue || $options[$n]['value'] == $fieldValue)
+						$op = $options[$n];
+						if ($op['key'] == $fieldValue || $op['value'] == $fieldValue)
 						{
 							$options[$n]['selected'] = true;
 						}
+						
+						if ($fieldValue == $op['key'])
+						{
+							$maskedValue = $op['value'];
+						}
 					}
+					
+					
 				}
 				else
 				{
@@ -152,12 +161,12 @@ class Controller {
 					$entityID = $fieldValue;
 					if (strcmp($fieldValue, '0')===0)
 					{
-						$fieldValue = '-';
+						$maskedValue = '-';
 					}
 					else
 					{
-						$otherEntity = $context->database->fetchEntity($context, $field->entity, $fieldValue);	
-						$fieldValue = $otherEntity->name;						
+						$otherEntity = $context->database->fetchEntityByID($context, $field->entity, $fieldValue);	
+						$maskedValue = $otherEntity->name;						
 					}
 				}
 				
@@ -165,6 +174,7 @@ class Controller {
 					'name' => $field->name, 
 					'label' => $field->label, 
 					'value' => $fieldValue, 
+					'maskedValue' => $maskedValue,
 					'visible' => $field->grid, 
 					'type' => $field->formType, 
 					'class' => $field->formClass, 
