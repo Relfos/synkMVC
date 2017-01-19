@@ -200,6 +200,14 @@ class Controller {
 		$grid = array (
 		  'headers' => $headers,		  
 		  'rows' => $rows,
+		  'pages' => array( 
+					array("id" => '«', 'disabled'=> true), 
+					array("id" => 1, 'disabled'=> false), 
+					array("id" => 2, 'disabled'=> false), 
+					array("id" => 3, "selected" => true, 'disabled'=> false), 
+					array("id" => 4, 'disabled'=> false),
+					array("id" => '»', 'disabled'=> false)
+					)
 		  );	   
 		  		
 		$context->grid = $grid;

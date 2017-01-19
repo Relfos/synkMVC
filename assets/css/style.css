@@ -498,3 +498,16 @@ text-transform: uppercase;
     color: #3c763d;
 }
 
+
+.pagination > li > a 
+{
+	color:#384452;
+    background-color: #fff;
+}
+
+.pagination > .active > a, .pagination > .active > span, .pagination > .active > a:hover, .pagination > .active > span:hover, .pagination > .active > a:focus, .pagination > .active > span:focus
+{
+    color: #fff;
+    background-color: #384452;
+    border-color: #384452;
+}

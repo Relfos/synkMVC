@@ -35,7 +35,6 @@ $context->prepare();
 
 $action = $context->loadVarFromRequest('action', 'page');
 
-
 if (strcmp($action, 'page') === 0) {
 	$context->layout = file_get_contents('views/layout.html');
 	$action = 'render';
