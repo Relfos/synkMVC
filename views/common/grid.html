@@ -48,7 +48,11 @@
 <div class="col-md-12 text-center">		
 	<form role="form" id="data_form">
 	<button type="button" class="btn btn-theme" onclick="navigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
-	<button type="button" class="btn btn-theme" onclick="download('current', 'export', 'format=excel&class={{module.entity}}')">Exportar</button>
+
+	{{#grid.exports.0}}
+	<button type="button" class="btn btn-theme dropdown-toggle" data-toggle="modal" data-target="#exportModal">Exportar</button>
+	{{/grid.exports.0}}
+	
 	<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">Filtrar</button>
 	{{#filter}}
 	<button type="button" class="btn btn-theme" onclick="navigate('current', 'unfilter')">Limpar</button>
@@ -56,15 +60,47 @@
 	</form>
 </div>
 
-<script>
 
+{{#grid.exports.0}}
+<div id="exportModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{module.title}} - Exportação</h4>
+      </div>
+      <div class="modal-body">
+		
+		<p>Os seguintes formatos estão disponiveis para exportação de dados.</p>
+		<table class="table table-hover">		
+			{{#grid.exports}}
+			<tr><td class="col-xs-8">{{label}}</td>
+			<td class="col-xs-4"><a href="#" onclick="downloadFile('exportProgress', 'current', 'export', 'format={{format}}&class={{module.entity}}')" class="btn btn-theme small_btn">Exportar</a></td>
+			{{/grid.exports}}
+		</table>
+		<div class="progress">
+		  <div id='exportProgress' class="progress-bar progress-bar-striped" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width:0%;"></div>
+		</div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-theme" data-dismiss="modal">Fechar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+{{/grid.exports.0}}
+
+<script>
 function searchEntity()
 {
 	$('#searchModal').one('hidden.bs.modal', function(){
 		navigate('current', 'filter', 'class={{module.entity}}&'+gather('field_name,field_value'));
 	}).modal('hide');	
 }
-
 </script>
 
 <!-- Modal -->

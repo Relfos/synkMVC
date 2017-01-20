@@ -1,9 +1,9 @@
 <?php
 
-require_once '/../libs/PHPExcel.php';
+require_once __DIR__.'/../libs/PHPExcel.php';
 	
 class ExcelPlugin
-{
+{	
 	function __construct($context) {
 	}
 
@@ -16,8 +16,9 @@ class ExcelPlugin
 	
 	public function export($context, $entityClass)
 	{
-		$objPHPExcel = new PHPExcel();
-		
+		$progress = new ProgressBar();
+
+		$objPHPExcel = new PHPExcel();		
 					
 		$objPHPExcel->getProperties()->setCreator("Synkdata")
 							 ->setLastModifiedBy("Synkdata")
@@ -41,6 +42,7 @@ class ExcelPlugin
 		
 		$entities = $context->database->fetchAllEntities($context, $entityClass, $context->filter, null);	
 		$i = 1;
+		$total = count($entities);
 		foreach($entities as $entity) {
 			$data = array();
 			
@@ -56,24 +58,17 @@ class ExcelPlugin
 					
 				}			
 			}
+
+			$progress->update($i, $total);	
 		}
-            
+            			
 		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');	
 		ob_start();
 		$objWriter->save('php://output');
 		$excelOutput = ob_get_clean();
-		$size = strlen($excelOutput);
-
-		header('Content-Description: File Transfer');
-		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename=' . $entityClass.'_list.xlsx'); 
-		header('Content-Transfer-Encoding: binary');
-		header('Connection: Keep-Alive');
-		header('Expires: 0');
-		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
-		header('Pragma: public');
-		header('Content-Length: ' . $size);			
-		echo $excelOutput;
+		
+		$fileName = $entityClass.'_list.xlsx';
+		sendDownload($fileName, $excelOutput, null);
 	}		
 }
 	

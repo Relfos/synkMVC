@@ -39,8 +39,45 @@ function fixNameCase($name)
 	return substr_replace($fixed,'', -1);		
 }
 
+function sendDownload($fileName, $data, $mimeType)
+{
+	if (is_null($mimeType))
+	{
+		$mimeType = 'application/octet-stream';
+	}
+	
+	$size = strlen($data);
+	
+	if (isset($_REQUEST['ajax']))
+	{
+		$data = base64_encode($data);
+		echo
+"{
+	\"mimetype\": \"$mimeType\",
+	\"filename\": \"$fileName\",
+	\"data\": \"$data\"
+}";		
+	}
+	else
+	{
+		header('Content-Description: File Transfer');
+		header('Content-Type: '.$mimeType);
+		header('Content-Disposition: attachment; filename=' . $fileName); 
+		header('Content-Transfer-Encoding: binary');
+		header('Connection: Keep-Alive');
+		header('Expires: 0');
+		header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+		header('Pragma: public');
+		header('Content-Length: ' . $size);			
+		echo $data;			
+	}
+	
+}
+
 class ProgressBar
 {
+	public $data = null;
+	
 	function __construct()
 	{
 		set_time_limit(0);
@@ -57,7 +94,7 @@ class ProgressBar
 	function update($current, $max)
 	{
 		$progress = floor(($current / $max) * 100);
-		file_put_contents($this->fileName, $progress);					
+		file_put_contents($this->fileName, $progress);
 	}
 }
 

@@ -15,7 +15,7 @@ class Controller {
 	   }
 	   else
 	   {
-		   $progress = 0;
+		   $progress = '0';
 	   }
 	   
 	   echo $progress;
@@ -225,10 +225,17 @@ class Controller {
 			$pages = null;
 		}
 		
+		$exports = array(
+			array('format' => 'excel', 'label' => 'Excel'),
+			array('format' => 'CVS', 'label' => 'CSV'),
+			array('format' => 'XML', 'label' => 'XML')
+			);
+		
 		$grid = array (
 		  'headers' => $headers,		  
 		  'rows' => $rows,
-		  'pages' => $pages
+		  'pages' => $pages,
+		  'exports' => $exports
 		  );	   
 		  		
 		$context->grid = $grid;
