@@ -63,16 +63,26 @@ class Context {
 	public function execute($action)
 	{
 		$controllerFile = 'controllers/'.$this->curModule.'.php';
-		if (!file_exists($controllerFile))
+		if (file_exists($controllerFile))
 		{
-			echo "Could not find controller file for  ".$this->curModule;
-			return;
+			require_once ($controllerFile);
+			
+			$controllerClass = ucfirst($this->curModule)."Controller";
 		}
-		
-		require_once ($controllerFile);
-
-		$controllerClass = ucfirst($this->curModule)."Controller";
-		
+		else
+		{
+			if (!is_null($this->module->entity))
+			{
+				echo "Entity  ".$this->curModule;
+				$controllerClass = "ModelController";
+			}
+			else
+			{
+				echo "Could not find controller file for  ".$this->curModule;
+				return;	
+			}			
+		}
+						
 		if (!class_exists($controllerClass, false))
 		{
 			echo "Could not find controller class for ".$this->curModule;
