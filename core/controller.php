@@ -228,7 +228,8 @@ class Controller {
 		$exports = array(
 			array('format' => 'excel', 'label' => 'Excel'),
 			array('format' => 'CVS', 'label' => 'CSV'),
-			array('format' => 'XML', 'label' => 'XML')
+			array('format' => 'XML', 'label' => 'XML'),
+			array('format' => 'json', 'label' => 'JSON')
 			);
 		
 		$grid = array (
