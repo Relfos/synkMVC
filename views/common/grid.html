@@ -45,14 +45,16 @@
 	</table>
 </div>
 
-			
-<form role="form" id="data_form">
-<button type="button" class="btn btn-theme" onclick="navigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
-<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">Filtrar</button>
-{{#filter}}
-<button type="button" class="btn btn-theme" onclick="navigate('current', 'unfilter')">Limpar</button>
-{{/filter}}
-</form>
+<div class="col-md-12 text-center">		
+	<form role="form" id="data_form">
+	<button type="button" class="btn btn-theme" onclick="navigate('current', 'edit', 'id=0&class={{module.entity}}')">Criar</button>
+	<button type="button" class="btn btn-theme" onclick="download('current', 'export', 'format=excel&class={{module.entity}}')">Exportar</button>
+	<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">Filtrar</button>
+	{{#filter}}
+	<button type="button" class="btn btn-theme" onclick="navigate('current', 'unfilter')">Limpar</button>
+	{{/filter}}
+	</form>
+</div>
 
 <script>
 

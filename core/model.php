@@ -149,6 +149,29 @@ class ModelController extends Controller {
 		}
 		echo ']';
 	}
+	
+	public function export($context)
+	{
+		//var_dump ($_REQUEST); die();
+		$entityClass = $_REQUEST['class'];
+		$format = $_REQUEST['format'];
+				
+		$pluginFile = 'plugins/'.$format.'.php';
+		if (file_exists($pluginFile))
+		{
+			require_once($pluginFile);	
+		}
+		else
+		{
+			echo "Could not load plugin '".$format."'";
+			die();
+		}
+		
+		
+		$pluginClass = ucfirst($format)."Plugin";
+		$plugin = new $pluginClass($context);
+		$plugin->export($context, $entityClass);
+	}
   
 } 
 

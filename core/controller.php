@@ -24,7 +24,7 @@ class Controller {
    public function render($context)
    {
 		$viewFile = $context->curView.'.html';
-		$viewPath = 'views/'. $context->curModule.'/'.$viewFile;
+		$viewPath = 'views/'. $context->module->name.'/'.$viewFile;
 	   
 		if (!file_exists($viewPath))
 		{
@@ -33,7 +33,7 @@ class Controller {
 		
 		if (!file_exists($viewPath))
 		{
-			$moduleTemplate = "Could not load view '".$context->curView."' for ".$context->curModule;			
+			$moduleTemplate = "Could not load view '".$context->curView."' for ".$context->module->name;			
 		}
 		else
 		{

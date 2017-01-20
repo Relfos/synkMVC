@@ -62,30 +62,29 @@ class Context {
 	
 	public function execute($action)
 	{
-		$controllerFile = 'controllers/'.$this->curModule.'.php';
+		$controllerFile = 'controllers/'.$this->module->name.'.php';
 		if (file_exists($controllerFile))
 		{
 			require_once ($controllerFile);
 			
-			$controllerClass = ucfirst($this->curModule)."Controller";
+			$controllerClass = ucfirst($this->module->name)."Controller";
 		}
 		else
 		{
 			if (!is_null($this->module->entity))
 			{
-				echo "Entity  ".$this->curModule;
 				$controllerClass = "ModelController";
 			}
 			else
 			{
-				echo "Could not find controller file for  ".$this->curModule;
+				echo "Could not find controller file for  ".$this->module->name;
 				return;	
 			}			
 		}
 						
 		if (!class_exists($controllerClass, false))
 		{
-			echo "Could not find controller class for ".$this->curModule;
+			echo "Could not find controller class for ".$this->module->name;
 			return;
 		}
 		
@@ -98,7 +97,7 @@ class Context {
 		}
 		else
 		{
-			echo "Invalid action $action on controller ".$this->curModule;
+			echo "Invalid action $action on controller ".$this->module->name;
 		}
 	}
 	
@@ -219,9 +218,7 @@ class Context {
 			return;
 		}
 		
-		$_SESSION['module'] = $module;
-		$this->curModule = $module;
-			
+		$_SESSION['module'] = $module;		
 		
 		$this->changeView($this->module->defaultAction);
 	}

@@ -128,6 +128,19 @@ function navigate(module, action, otherArgs)
 	});	
 }
 
+function download(module, action, otherArgs)
+{	
+	var args = 'module='+module+'&action='+action;
+		
+	if (otherArgs)
+	{
+		args = args + '&'+otherArgs;
+
+	}
+	
+	window.location = 'index.php?'+args;
+}
+
 function getProgress(module, fn)
 {		
 	$.ajax({
