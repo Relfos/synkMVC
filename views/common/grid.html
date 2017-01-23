@@ -147,9 +147,11 @@ function saveEntity(id, className)
 		{{/grid.headers}}	  
 		
 		//alert(fields);
+				
+		$('#editModal').one('hidden.bs.modal', function(){
+				navigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
+			}).modal('hide');			
 		
-		$('#editModal').modal('hide');	
-		navigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
 	});
 	
 	form.submit();
@@ -161,7 +163,9 @@ function deleteEntity(id, className)
 	{
 		if (val == true)
 		{
-			navigate('current', 'remove', 'id='+id+'&class='+className);
+			$('#editModal').one('hidden.bs.modal', function(){
+				navigate('current', 'remove', 'id='+id+'&class='+className);
+			}).modal('hide');	
 		}		
 	});	
 }
