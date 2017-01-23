@@ -171,8 +171,8 @@ a:focus {
 }
 
 .mtb {
-	margin-top: 80px;
-	margin-bottom: 80px;
+	margin-top: 10px;
+	margin-bottom: 20px;
 }
 
 .mb {
@@ -328,6 +328,7 @@ a:focus {
 	padding-top: 60px;
 	padding-bottom: 60px;
 	background: #384452;
+	 box-shadow: 0px 500px 0px 500px #384452;
 }
 
 #footerwrap p {
@@ -353,18 +354,6 @@ a:focus {
 ################################################################# */
 /* General Tweaks */
 
-#blue {
-	background: #00b3fe;
-	margin-top: 60px;
-	margin-bottom: 60px;
-	padding-top: 25px;
-	padding-bottom: 25px;
-}
-
-#blue h3 {
-	color: white;
-	margin-left: 15px;
-}
 
 .ctitle {
 	color: #00b3fe;
@@ -510,4 +499,52 @@ text-transform: uppercase;
     color: #fff;
     background-color: #384452;
     border-color: #384452;
+}
+
+#tab_area .panel-body
+{
+	background: #00b3fe;	
+}
+
+#tab_area .panel-heading
+{
+	background: #384452;
+	padding-bottom: 0px;	
+	padding-top: 10px;
+	border:none;
+}
+
+#tab_area .panel
+{
+	border:  none;
+	margin-bottom:0px;
+}
+
+#tab_area .nav-tabs
+{
+	border:  none;
+}
+
+#tab_area  .nav-tabs > li.active > a, #tab_area .nav-tabs > li.active > a:hover, #tab_area  .nav-tabs > li.active > a:focus
+{
+	background: #00b3fe;
+}
+
+#tab_area {
+	background: #384452;
+	margin-top: 70px;
+}
+
+#blue {
+	background: #00b3fe;
+	margin-top: 60px;
+	padding-top: 20px;
+	padding-bottom:4px;
+}
+
+#blue h3 {
+	color: white;
+	margin-left: 15px;
+	margin-top: 10px;
+	margin-bottom: 10px;
 }

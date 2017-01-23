@@ -3,7 +3,8 @@
 class Context {
     public $hasLogin = false;  
 	public $entityID = null;
-
+	public $outputAction = 'patch';
+	
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);		
 		$this->modules = array ();
@@ -62,6 +63,29 @@ class Context {
 	
 	public function execute($action)
 	{
+		ob_start();
+		$this->runController($action);
+		$html = ob_get_contents();
+		ob_end_clean();
+
+		if (isset($_REQUEST['json']))
+		{
+			$json_array=array(
+			'action' => $this->outputAction,
+			'module'=> $this->module->name,			
+			'title'=> $this->module->title,
+			'content'=>$html
+			);
+			echo json_encode($json_array);	
+		}
+		else
+		{
+			echo $html;
+		}		
+	}
+	
+	private function runController($action)
+	{
 		$controllerFile = 'controllers/'.$this->module->name.'.php';
 		if (file_exists($controllerFile))
 		{
@@ -98,7 +122,7 @@ class Context {
 		else
 		{
 			echo "Invalid action $action on controller ".$this->module->name;
-		}
+		}		
 	}
 	
 	public function createModule($name) {	
@@ -246,7 +270,7 @@ class Context {
 	
 	function reload()
 	{
-		echo "[RELOAD]";
+		$this->outputAction = 'reload';
 	}
 
 	function loadVar($name, $defaultValue)

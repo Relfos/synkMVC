@@ -49,23 +49,25 @@ function gather(argList)
 
 function patchContent(data)
 {
-	if (data == '[RELOAD]')
+	switch (data.action)
 	{
-		location.reload(); 
-	}
-	else
-	if (data == '[KEEP]')
-	{
-		return;
-	}
-	else
-	{
-		$('#body_content').html(data);
+		case 'patch': 
+		{
+			$('#body_content').html(data.content);
+			$('#title').html(data.title);
+			break;
+		}
+		
+		case 'reload':
+		{
+			location.reload(); 
+			break;
+		}
 	}
 }
 
-function navigate(module, action, otherArgs)
-{
+function navigate(module, action, otherArgs, ignoreState)
+{	
 	if (!action)
 	{
 		action = 'render';
@@ -78,13 +80,24 @@ function navigate(module, action, otherArgs)
 		args = args + '&'+otherArgs;
 	}
 		
+	var targetURL = 'index.php?json=true&'+args;
+		
 	$.ajax({
-		url: 'index.php?'+args,
-		type:'POST',
-		success: function(data){		
-			patchContent(data);
-		}
-	});	
+			url: targetURL,
+			type:'POST',
+			success: function(data)
+			{	
+				data =  $.parseJSON(data);
+				if (!ignoreState)
+				{
+					//alert('pushed sate');
+					window.history.pushState({"module": module, "action":action, "args": otherArgs}, "", module);	
+				}
+
+				patchContent(data);
+			}
+		});		
+	return false;
 }
 
 function getProgress(module, fn)
@@ -189,3 +202,10 @@ function downloadFile(progressBar, module, action, otherArgs)
 	}
 
 }
+
+window.onpopstate = function(e){	
+    if(e.state){		
+		//alert(e.state.module);
+		navigate(e.state.module, e.state.action, e.state.args, true);        
+    }
+};
