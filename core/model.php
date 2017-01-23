@@ -76,6 +76,7 @@ class ModelController extends Controller {
 		$entity->remove($context);
 	   
 		$context->changeView('grid');
+		$context->reload();
 		$this->render($context);
 	}
 
