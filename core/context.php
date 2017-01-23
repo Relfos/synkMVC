@@ -3,11 +3,15 @@
 class Context {
     public $hasLogin = false;  
 	public $entityID = null;
-	public $outputAction = 'patch';
+	public $outputTarget;
+	public $hasBody = false;
+	public $hasHeader = false;
 	
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);		
 		$this->modules = array ();
+		
+		$this->outputTarget = $this->loadVarFromRequest('target', 'main');
 		
 		$this->config = new Config();
 				
@@ -71,8 +75,8 @@ class Context {
 		if (isset($_REQUEST['json']))
 		{
 			$json_array=array(
-			'action' => $this->outputAction,
-			'module'=> $this->module->name,			
+			'target' => $this->outputTarget,
+			'module'=> $this->module->name,						
 			'title'=> $this->module->title,
 			'content'=>$html
 			);
@@ -270,7 +274,8 @@ class Context {
 	
 	function reload()
 	{
-		$this->outputAction = 'reload';
+		$this->outputTarget = 'body_content';
+		$this->hasBody = true;
 	}
 
 	function loadVar($name, $defaultValue)

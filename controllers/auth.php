@@ -33,9 +33,10 @@ class AuthController extends Controller {
 	   }
 	   else
 	   {
-			$context->warning = "Dados de login invalidos!" ;
-			$this->render($context);
+			$context->warning = "Dados de login invalidos!" ;			
 	   }	  	  
+	   
+	   $this->render($context);
    }
 
    function logout($context)
@@ -43,6 +44,7 @@ class AuthController extends Controller {
 		$context->logOut();
 		$context->changeModule('auth');		   
 		$context->reload();
+		$this->render($context);
    }
 
 } 

@@ -47,38 +47,28 @@ function gather(argList)
 	return args;
 }
 
-function patchContent(data)
-{
-	switch (data.action)
-	{
-		case 'patch': 
-		{
-			$('#body_content').html(data.content);
-			$('#title').html(data.title);
-			break;
-		}
-		
-		case 'reload':
-		{
-			location.reload(); 
-			break;
-		}
-	}
-}
-
-function navigate(module, action, otherArgs, ignoreState)
+function navigate(module, action, otherArgs, targetDiv, ignoreState)
 {	
 	if (!action)
 	{
 		action = 'render';
 	}
 	
-	var args = 'module='+module+'&action='+action;
+	var mainNavigation = false;
+	
+	if (!targetDiv)
+	{
+		mainNavigation = true;
+		targetDiv = 'main';
+	}
+	
+	var args = 'module='+module+'&action='+action+'&target='+targetDiv;
 		
 	if (otherArgs)
 	{
 		args = args + '&'+otherArgs;
 	}
+	
 		
 	var targetURL = 'index.php?json=true&'+args;
 		
@@ -87,14 +77,15 @@ function navigate(module, action, otherArgs, ignoreState)
 			type:'POST',
 			success: function(data)
 			{	
-				data =  $.parseJSON(data);
-				if (!ignoreState)
+				data =  $.parseJSON(data);				
+				$('#'+data.target).html(data.content);
+				$('#title').html(data.title);
+
+				if (!ignoreState && mainNavigation)
 				{
 					//alert('pushed sate');
-					window.history.pushState({"module": module, "action":action, "args": otherArgs}, "", module);	
+					window.history.pushState({"module": data.module, "action":action, "args": otherArgs}, "", data.module);	
 				}
-
-				patchContent(data);
 			}
 		});		
 	return false;

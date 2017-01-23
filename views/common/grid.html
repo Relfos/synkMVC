@@ -37,7 +37,8 @@
 				{{/visible}}
 			{{/columns }}	
 
-			<td><a href="#" onclick="navigate('current', 'edit', 'id={{rowID}}')" class="btn btn-theme small_btn">Editar</a></td>
+			<!--<td><a href="#" onclick="navigate('current', 'edit', 'id={{rowID}}')" class="btn btn-theme small_btn">Editar</a></td> -->
+			<td><a href="#" onclick="editEntity('{{rowID}}');" class="btn btn-theme small_btn">Editar</a></td>
 		  </tr>
 		{{/grid.rows}}
 	 
@@ -94,7 +95,77 @@
 </div>
 {{/grid.exports.0}}
 
+<div id="editModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">{{module.title}} - Edição</h4>
+      </div>
+      <div class="modal-body">
+		
+		<div id="edit_content"></div>
+        
+      </div>
+      <div class="modal-footer">
+		<button type="button" class="btn btn-theme" onclick="saveEntity(currentEntityID, '{{module.entity}}');">Guardar</button>
+		<button type="button" class="btn btn-theme" onclick="$('#editModal').modal('hide');	">Cancelar</button>
+		<button type="button" class="btn btn-theme" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">Apagar</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <script>
+var currentEntityID;
+function editEntity(id)
+{
+	currentEntityID = id;
+	$('#edit_content').html('...');
+	navigate('current', 'edit', 'id='+id, 'edit_content');
+	$('#editModal').modal('show');	
+}
+
+function saveEntity(id, className)
+{
+	var form = $('#data_form');
+	form.validator();
+	form.on('submit', function (e) {
+		if (e.isDefaultPrevented()) 
+		{
+			return;
+		} 		
+		
+		e.preventDefault();
+		
+		var fields = '';
+		{{#grid.headers}}
+			fields = fields + '{{name}},';			
+		{{/grid.headers}}	  
+		
+		//alert(fields);
+		
+		$('#editModal').modal('hide');	
+		navigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
+	});
+	
+	form.submit();
+}
+
+function deleteEntity(id, className)
+{
+	bootbox.confirm("Não será possivél voltar atrás. Tem a certeza que quer apagar esta entidade?", function(val)
+	{
+		if (val == true)
+		{
+			navigate('current', 'remove', 'id='+id+'&class='+className);
+		}		
+	});	
+}
+
 function searchEntity()
 {
 	$('#searchModal').one('hidden.bs.modal', function(){

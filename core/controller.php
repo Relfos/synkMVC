@@ -39,14 +39,19 @@ class Controller {
 		{
 			$moduleTemplate = file_get_contents($viewPath);			
 		}
-      
-		if (isset($context->layout))
-		{
-			$layoutTemplate = str_replace('$body', $moduleTemplate, $context->layout);	
+		      
+		$layoutTemplate = $moduleTemplate;
+	  
+		if ($context->hasBody)
+		{			
+			$body = file_get_contents('views/body.html');
+			$layoutTemplate = str_replace('$body', $layoutTemplate, $body);	
 		}
-		else
+		
+		if ($context->hasHeader)
 		{
-			$layoutTemplate = $moduleTemplate;
+			$header = file_get_contents('views/header.html');
+			$layoutTemplate = str_replace('$body', $layoutTemplate, $header);	
 		}
 				
 		if (strpos($layoutTemplate, '{{#grid.') !== false) {

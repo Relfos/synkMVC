@@ -1,43 +1,3 @@
-<script>
-
-function saveEntity(id, className)
-{
-	var form = $('#data_form');
-	form.validator();
-	form.on('submit', function (e) {
-		if (e.isDefaultPrevented()) 
-		{
-			return;
-		} 		
-		
-		e.preventDefault();
-		
-		var fields = '';
-		{{#grid.headers}}
-			fields = fields + '{{name}},';			
-		{{/grid.headers}}	  
-		
-		//alert(fields);
-		navigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
-	});
-	
-	form.submit();
-}
-
-function deleteEntity(id, className)
-{
-	bootbox.confirm("Não será possivél voltar atrás. Tem a certeza que quer apagar esta entidade?", function(val)
-	{
-		if (val == true)
-		{
-			navigate('current', 'remove', 'id='+id+'&class='+className);
-		}		
-	});
-
-	
-}
-</script>
-
 {{#grid.rows}}
 <form role="form" id="data_form">
 {{#columns}}
@@ -131,11 +91,5 @@ function deleteEntity(id, className)
 		
 	</div>
 {{/columns }}	
-
-	<div class="form-group">
-		<button type="button" class="btn btn-theme" onclick="saveEntity({{rowID}}, '{{class}}')">Guardar</button>
-		<button type="button" class="btn btn-theme" onclick="navigate('current', 'render')">Cancelar</button>
-		<button type="button" class="btn btn-theme" onclick="deleteEntity({{rowID}}, '{{class}}')">Apagar</button>
-	</div>
 </form>
 {{/grid.rows}}

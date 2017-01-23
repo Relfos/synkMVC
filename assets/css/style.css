@@ -443,6 +443,10 @@ csmall2 {
 text-transform: uppercase;
 }
 
+.btn  {
+	vertical-align: inherit;
+}
+
 .error {
 	margin-top: 10px;
 	margin-bottom: 10px;
@@ -547,4 +551,24 @@ text-transform: uppercase;
 	margin-left: 15px;
 	margin-top: 10px;
 	margin-bottom: 10px;
+}
+
+
+.modal {
+  text-align: center;
+  padding: 0!important;
+}
+
+.modal:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px; /* Adjusts for spacing */
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
 }
