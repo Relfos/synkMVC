@@ -169,9 +169,9 @@ class Field
 		return $this;
 	}	
 	
-	function encodeValue($context, $value)
+	/*function encodeValue($context, $value)
 	{
-		$value = $context->sql->escapeString($value);
+		$value = $context->database->escapeString($value);
 		if (strpos($this->dbType, 'varchar') !== false || strpos($this->dbType, 'text') !== false )
 		{
 			return "'$value'";
@@ -180,7 +180,7 @@ class Field
 		{
 			return $value;	
 		}		
-	}
+	}*/
 	
 }
 

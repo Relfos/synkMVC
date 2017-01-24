@@ -2,6 +2,7 @@
 
 class Context {
     public $hasLogin = false;  
+	public $isDownload = false;
 	public $entityID = null;
 	public $outputTarget;
 	public $templateStack = array();
@@ -13,25 +14,30 @@ class Context {
 		$this->outputTarget = $this->loadVarFromRequest('target', 'main');
 		
 		$this->config = new Config();
-		$this->sql = new SQL($this->config);
+
+		$this->initDatabase();
 
 		if ($this->hasLogin)
 		{
-			$databaseName = $this->loadVar('user_db', '');	
-			$this->sql->query('CREATE DATABASE IF NOT EXISTS '.$databaseName);
-									
-			$this->databaseName = $databaseName;
-			
-			$this->sql->query("CREATE TABLE IF NOT EXISTS $databaseName.enums (
+			$dbName = $this->loadVar('user_db', '');	
+			$this->dbName = $dbName;
+
+			$fields = array(
+				array('name' => 'name', 'type' => 'varchar(30)'),
+				array('name' => 'values', 'type' => 'text'),
+				array('name' => 'keys', 'type' => 'text'),
+			);
+			$this->database->createDatabase($dbName, 'enums', $fields, 'name');
+											
+			/*$this->sql->query("CREATE TABLE IF NOT EXISTS $databaseName.enums (
 			`name` VARCHAR(30) NOT NULL,
 			`values` TEXT NOT NULL,
 			`keys` TEXT NOT NULL,
 			PRIMARY KEY (`name`)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8");
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8");*/
 			
-			$result = $this->sql->query("SELECT count(*) as total FROM $databaseName.enums;");
-			$row = $this->sql->fetchRow($result);
-			if ($row['total'] == '0')
+			$total = $this->database->getCount($dbName, 'enums');			
+			if ($total == '0')
 			{
 				$this->createEnum('product_types', array('Produto', 'Serviço', 'Outro'));
 
@@ -41,15 +47,29 @@ class Context {
 		}	
 		else
 		{
-			$this->databaseName = $this->config->data;
-		}
+			$this->dbName = $this->config->database;
+		}		
+	}
+	
+	public function initDatabase()
+	{
+		$sqlPlugin = $this->config->sqlPlugin;
 		
-		$this->database = new Database($this);		
+		$pluginPath = 'plugins/database/'.$sqlPlugin.'.php';
+		if (!file_exists($pluginPath))
+		{
+			echo 'Missing database plugin: '.$sqlPlugin;
+			die();
+		}
+		require_once($pluginPath);
+		
+		$dbClassName = $this->config->sqlPlugin.'Plugin';
+		$this->database = new $dbClassName($this);
 	}
 	
 	public function prepare()
 	{			
-		if ($this->sql->failed)
+		if ($this->database->failed)
 		{
 			$this->hasLogin = false;
 			$this->changeModule('settings');	
@@ -213,13 +233,22 @@ class Context {
 			$keys .= $key;
 			$i++;
 		}
-		$this->sql->query("INSERT INTO enums (`name`, `values`, `keys`) VALUES ('$name', '$values', '$keys')");			
+		
+		$dbFields = array(
+			array('name' => $name),
+			array('values' => $values),
+			array('keys' => $keys)
+		);
+
+		$dbName = $this->dbName;		
+		$this->database->insertObject($dbName, 'enums', $dbFields);
+		//$this->sql->query("INSERT INTO enums (`name`, `values`, `keys`) VALUES ('$name', '$values', '$keys')");			
 	}
 	
 	function fetchEnum($name)
 	{
-		$dbName = $this->databaseName;
-		$row = $this->sql->fetchSingleRow("SELECT `values`, `keys` FROM $dbName.enums WHERE `name` = '$name'");			
+		$dbName = $this->dbName;
+		$row = $this->database->fetchObject($dbName, 'enums',  "`name` = '$name'");			
 		$temp  = $row['values'];
 		$names = explode("|", $temp);			
 		
@@ -359,7 +388,10 @@ class Context {
 	
 	public function log($text)
 	{
-		file_put_contents($this->config->logFile, "$text\n", FILE_APPEND | LOCK_EX);	
+		if (!is_null($this->config->logFile))
+		{
+			file_put_contents($this->config->logFile, "$text\n", FILE_APPEND | LOCK_EX);				
+		}
 	}
 	
 	public function saveConfiguration()
@@ -419,6 +451,14 @@ class Context {
 		}	
 	}
 	
+	public function getCallstack()
+	{
+		ob_start();
+        debug_print_backtrace();
+        $trace = ob_get_contents();
+        ob_end_clean(); 		
+		return $trace;
+	}
 }
 
 

@@ -205,6 +205,10 @@ class Controller {
 						$maskedValue = $otherEntity->name;						
 					}
 				}
+				else
+				{
+					$entityID = null;
+				}
 				
 				$columns[] = array(
 					'name' => $field->name, 

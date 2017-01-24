@@ -1,11 +1,13 @@
 <?php
 
-class SQL
+class mysqlPlugin extends DatabasePlugin
 {
-	public $db;
+	private $db;
 	
-	function __construct($config) 
+	function __construct($context) 
 	{
+		$config = $context->config;
+		
 		$this->db = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass);
 		if ($this->db->connect_error)  
 		{
@@ -19,45 +21,185 @@ class SQL
 		}					
 		
 		mb_internal_encoding('UTF-8');
-	}
 		
-	/*function selectDatabase($name)
-	{
-		if ($this->failed)
+		parent::__construct($context);
+	}
+
+	// method overrides
+	public function createDatabase($name)
+	 {
+		$this->query("CREATE DATABASE IF NOT EXISTS `$name`"); 
+	 }
+	 
+	 public function createTable($dbName, $table, $fields, $key = null)
+	 {
+		$this->selectDatabase($dbName);
+		 
+		$query = '';
+		
+		if (!$key)
 		{
-			return;
+			$query .= '`id` int(10) unsigned NOT NULL AUTO_INCREMENT, ';
+			$query .= '`insertion_date` int(10) unsigned NOT NULL, ';
+			$key = 'id';
 		}
-		mysqli_select_db($this->db, $name) or die($this->db->error);
-	}*/
+		
+		foreach($fields as $fieldName => $fieldType) 
+		{		
+			$query .= "`$fieldName` $fieldType NOT NULL, ";			
+		}
+		
+		$query = "CREATE TABLE IF NOT EXISTS $table (						
+			$query
+			PRIMARY KEY (`$key`)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8";
+		
+		$this->query($query);		 
+	 }
+	 
+	 public function getCount($dbName, $table, $condition = null)
+	 {
+		$this->selectDatabase($dbName);
+		$query = "SELECT count(*) as total FROM `$table`";
+		
+		if ($condition != null && strlen(condition)>0)
+		{
+			$query .= " WHERE ".$condition;
+		}
+		
+		$row = $this->fetchSingleRow($query);
+		if (is_null($row))
+		{
+			return 0;
+		}
+		
+		return intval($row['total']);		 
+	 }
+	 
+	 public function fetchObject($dbName, $table, $condition = null)
+	 {
+		$this->selectDatabase($dbName);
+		$query = "SELECT * FROM `$table` WHERE $condition";
+		return $this->fetchSingleRow($query);
+	 }
 	
-	function query($query)
+	 public function fetchAll($dbName, $table, $condition = null, $count = null, $offset = null)
+	 {		 
+		$this->selectDatabase($dbName);
+		$query = "SELECT * FROM `$table`";
+		
+		if (!is_null($condition))
+		{
+			$query .= " WHERE $condition";
+		}			
+		
+		if ($count)
+		{
+			if ($offset)
+			{
+				$query .= " LIMIT $offset , $count";
+			}
+			else
+			{
+				$query .= " LIMIT $count";
+			}
+		}		
+		
+		$result = $this->query($query);		
+		$rows = array();
+		while ($row = $this->fetchRow($result)) 
+		{
+			$rows[] = $row;
+		}
+		
+		return $rows;
+	 }
+	 
+	 public function deleteAll($dbName, $table, $condition = null)
+	 {
+		$this->selectDatabase($dbName);
+		$query = "DELETE FROM ".$table;
+		if ($condition != null && strlen($condition)>0)
+		{
+			$query .= " WHERE ".$condition;
+		}
+		
+		$this->query($query);		 
+	 }
+		
+	public function selectDatabase($name)
+	{
+		$this->query("USE $name;");
+	}
+	
+	public function saveObject($dbName, $table, $fields, $condition)
+	{
+		$query = '';
+		$i = 0;
+		foreach($fields as $fieldName => $fieldValue) 
+		{
+			if ($i>0)
+			{
+				$query .= ', ';
+			}
+			
+			$fieldValue = $this->encodeField($fieldValue);
+			$query .= "$fieldName=$fieldValue";						
+			$i++;
+		}
+
+		$this->selectDatabase($dbName);
+		$query = "UPDATE $table SET $query WHERE $condition";	
+		$this->query($query);
+	}
+	
+	public function insertObject($dbName, $table, $fields)
+	{
+		$fieldList = "";
+		$valueList = "";
+		$i = 0;
+		foreach($fields as $fieldName => $fieldValue) 
+		{									
+			if ($i>0)
+			{
+				$fieldList .= ', ';
+				$valueList .= ', ';
+			}
+			
+			$fieldList .= $fieldName;
+			$valueList .= $this->encodeField($fieldValue);
+			
+			$i++;
+		}
+		
+		$this->selectDatabase($dbName);
+		$query = "INSERT INTO $table ($fieldList) VALUES($valueList)";	
+		$this->query($query);
+	}
+	
+	//*******************
+	private function query($query)
 	{
 		if ($this->failed)
 		{
 			return null;
 		}
 
+		$this->context->log($query);
+		$this->context->log($this->context->getCallstack());
+		
 		//echo $query."<br>";		die();
 		$result = mysqli_query($this->db,$query);
 		if(!$result) 
 		{
 			$this->failed = true;
-			die($this->db->error."<br>".$query);	
+			echo $this->db->error."<br>".$query; die();	
 			return null;						
 		}
 		return $result;
 	}
 	
-	function getRowCount($result)
-	{
-		if ($result === false)
-		{
-			return 0;
-		}
-		return mysqli_num_rows($result);
-	}
-	
-	public function fetchRow($result)
+	private function fetchRow($result)
 	{
 		if (empty($result))	return null;
 
@@ -65,7 +207,7 @@ class SQL
 		return $row;
 	}
 	
-	public function fetchSingleRow($query)
+	private function fetchSingleRow($query)
 	{
 		$query .= ' LIMIT 1';
 		$result = $this->query($query);
@@ -77,11 +219,19 @@ class SQL
 		
 		return $row;
 	}
-	
-	public function escapeString($val)
+		
+	private function encodeField($value)
 	{
-		return mysqli_real_escape_string($this->db, $val);
+		if (is_numeric($value) || is_bool($value))
+		{
+			return $value;
+		}
+		
+		$value = mysqli_real_escape_string($this->db, $value);
+		
+		return "'$value'";
 	}
+	
 }
 
 

@@ -1,52 +1,62 @@
 <?php
 
-class Database
+abstract class DatabasePlugin
 {	
-	function __construct($context) {
-		$sql = $context->sql;
-		$config = $context->config;
+	public $failed = false;
+	public $context = null;
+	
+	// abstract methods
+	abstract public function createDatabase($name);
+	abstract public function createTable($dbName, $table, $fields, $key);
+	abstract public function getCount($dbName, $table, $condition = null);
+	abstract public function fetchObject($dbName, $table, $condition = null);
+	abstract public function fetchAll($dbName, $table, $condition = null, $count = null, $offset = null);
+	abstract public function deleteAll($dbName, $table, $condition = null);
+	abstract public function insertObject($dbName, $table, $fields);
+	abstract public function saveObject($dbName, $table, $fields, $condition);
+	
+	function __construct($context) {		
 		
-		if ($sql->failed)
+		$this->context = $context;
+		
+		if ($this->failed)
 		{
 			return;
 		}
 		
-		$dbName = $config->database;
-		$sql->query('CREATE DATABASE IF NOT EXISTS '.$dbName);
+		$dbName = $context->config->database;
+		$this->createDatabase($dbName);		
 		
-		if ($sql->failed)
+		if ($this->failed)
 		{
 			return;
 		}
 
-		$sql->query("CREATE TABLE IF NOT EXISTS $dbName.users (
-		`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
-		`name` VARCHAR(30) NOT NULL,
-		`hash` VARCHAR(40) NOT NULL,
-		`database` VARCHAR(80) NOT NULL,
-		PRIMARY KEY (`id`)
-		) ENGINE = InnoDB;");
+		$this->createTable($dbName, 'users', array(
+			'id' => 'integer unsigned',
+			'name' => 'varchar(30)',
+			'hash' => 'varchar(40)',
+			'database' => 'varchar(80)'
+		));
 
-		$result = $sql->query("SELECT count(*) as total FROM $dbName.users;");
-		$row = $sql->fetchRow($result);
-		if ($row['total'] == '0')
+		$total = $this->getCount($dbName, 'users');
+		if ($total == '0')
 		{
-
-			$user_name = 'admin@synkdata.com';
-			$user_pass = 'test';
-			
+			$user = $this->createEntity($context, 'user');			
+			$user->name = 'admin@synkdata.com';
+			$user->hash = $this->getPasswordHash('test');
+						
 			if ($config->instanced)
 			{
-				$user_db = 'crm'. uniqid();	
+				$user->database = 'crm'. uniqid();	
 			}
 			else
 			{
-				$user_db = $config->database;
+				$user->database = $config->database;
 			}
 			
-			$user_hash = $this->getPasswordHash($user_pass);
-
-			$sql->query("INSERT INTO $dbName.users (`name`, `hash`, `database`) VALUES ('$user_name', '$user_hash', '$user_db');");			
+			$user->save($context);
+			//$sql->query("INSERT INTO $dbName.users (`name`, `hash`, `database`) VALUES ('$user_name', '$user_hash', '$user_db');");			
 		}			
 	}
 	
@@ -73,9 +83,9 @@ class Database
 		}
 
 		$tableName = $entity->tableName;
-		$query = "SELECT * FROM $tableName WHERE $condition";
-
-		$row = $context->sql->fetchSingleRow($query);
+		$dbName =  $entity->dbName;
+		
+		$row = $this->fetchObject($dbName, $tableName, $condition);
 		
 		if (!is_null($row))
 		{
@@ -86,20 +96,15 @@ class Database
 		return $entity;
     }
 		
-    public function fetchAllEntities($context, $entityClass, $condition, $pagination) {
-		
+    public function fetchAllEntities($context, $entityClass, $condition = null, $pagination = null) 
+	{		
 		$entities = array();
 				
 		$templateEntity = $this->createEntity($context, $entityClass);
 		
 		$tableName =  $templateEntity->tableName;
-		
-		$query = "SELECT * FROM $tableName";
-		if ($condition != null && strlen(condition)>0)
-		{
-			$query .= " WHERE ".$condition;
-		}
-		
+		$dbName =  $templateEntity->dbName;
+				
 		if (!is_null($pagination))
 		{
 			$items_per_page = $pagination['items'];
@@ -110,14 +115,19 @@ class Database
 				$page = 0;
 			}
 			$offset = $page * $items_per_page;
-			$query .= " LIMIT $offset , $items_per_page";
+		}
+		else
+		{
+			$items_per_page = null;
+			$offset = null;
 		}
 		
-		$result = $context->sql->query($query);
-		
-		while ($row = $context->sql->fetchRow($result)) {
+		$rows = $this->fetchAll($dbName, $tableName, $condition, $items_per_page, $offset);
+		$total = count($rows);
+		for ($i=0; $i<$total; $i++)
+		{			
 			$entity = $this->createEntity($context, $entityClass);
-			$entity->loadFromRow($row);
+			$entity->loadFromRow($rows[$i]);
 			$entity->expand($context);
 			$entities[] = $entity;
 		}
@@ -129,34 +139,18 @@ class Database
 	{					
 		$templateEntity = $this->createEntity($context, $entityClass);
 		$tableName =  $templateEntity->tableName;
+		$dbName = $templateEntity->dbName;
 
-		$query = "SELECT count(*) as total FROM ".$tableName;
-		if ($condition != null && strlen(condition)>0)
-		{
-			$query .= " WHERE ".$condition;
-		}
-		
-		$row = $context->sql->fetchSingleRow($query);
-		if (is_null($row))
-		{
-			return 0;
-		}
-		
-		return intval($row['total']);
+		return $this->getCount($dbName, $tableName);
     }
 	
 	public function clearEntities($context, $entityClass, $condition)
 	{
 		$templateEntity = $this->createEntity($context, $entityClass);
 		$tableName =  $templateEntity->tableName;
+		$dbName = $templateEntity->dbName;
 		
-		$query = "DELETE FROM ".$tableName;
-		if ($condition != null && strlen(condition)>0)
-		{
-			$query .= " WHERE ".$condition;
-		}
-		
-		$context->sql->query($query);
+		$this->deleteAll($dbName, $tableName);	
 	}
 
 	function getPasswordHash($password)

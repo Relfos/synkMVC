@@ -177,8 +177,7 @@ class ModelController extends Controller {
 		{
 			echo "Could not load plugin '".$format."'";
 			die();
-		}
-		
+		}		
 		
 		$pluginClass = ucfirst($format)."Plugin";
 		$plugin = new $pluginClass($context);

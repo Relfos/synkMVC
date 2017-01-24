@@ -1,13 +1,13 @@
 {{#grid.rows}}
 <form role="form" id="data_form">
 {{#columns}}
-	<div class="form-group form_row">
+	<div class="form-group form_row ui-front">
 		<label for="{{name}}" class="control-label">{{label}}</label>
 
 		{{#entity}}
 			<input class="hidden" type="text" id="{{name}}" value="{{entityID}}">
 			
-			<input id="{{name}}_search" class="form-control" value="{{value}}">
+			<input id="{{name}}_search" class="form-control" value="{{maskedValue}}">
 			
 			<script> 			
 			$( "#{{name}}_search" ).autocomplete({

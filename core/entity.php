@@ -8,48 +8,43 @@ class Entity
 {
 	public $id = 0;
 	public $insertion_date = 0;
-	public $tableName = '';
+	public $tableName = null;
+	public $dbName = null;
 	public $fields = array();
 	public $exists = false;
 	
 	function __construct($context) {
 		$className = get_class($this);
-		$dbName = $context->databaseName;
+		$dbName = $context->dbName;
 		
-		$customTable = strlen($this->tableName)>0;
-		if (!$customTable)
+		if (is_null($this->tableName))
 		{
-			$tableName = $dbName.'.'.strtolower($className."_data");
-			$this->tableName = $tableName;			
+			$this->tableName = strtolower($className."_data");	
+		}
+
+		if (is_null($this->dbName))
+		{
+			$this->dbName = $context->dbName;			
 		}
 
 		$this->insertion_date = time();
 		
-		$query = "";
-		foreach($this->fields as $field) {
+		$dbFields = array();
+		foreach($this->fields as $field) 
+		{
 			$fieldName = $field->name;
 			$fieldType = $field->dbType;
 			$this->$fieldName = $field->defaultValue;
-			
-			$query .= "`$fieldName` $fieldType NOT NULL, ";			
+		
+			$dbFields[$fieldName] = $fieldType;
 		}
 		
 		global $entity_init;
 		
-		if (!$customTable)
+		if (!array_key_exists ($className, $entity_init))
 		{
-			if (!array_key_exists ($className, $entity_init))
-			{
-				$entity_init[$className] = true;
-				$query = "CREATE TABLE IF NOT EXISTS $tableName (
-					`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-					`insertion_date` int(10) unsigned NOT NULL,
-					$query
-					PRIMARY KEY (`id`)
-				) ENGINE=InnoDB DEFAULT CHARSET=utf8";
-			
-				$context->sql->query($query);							
-			}
+			$entity_init[$className] = true;			
+			$context->database->createTable($this->dbName, $this->tableName, $dbFields);			
 		}
 	}
 	
@@ -76,7 +71,7 @@ class Entity
 	
 	public function expand($context)
 	{		
-		$dbName = $context->databaseName;
+		$dbName = $context->dbName;
 		foreach($this->fields as $field) {
 			$fieldName = $field->name;			
 			
@@ -86,7 +81,7 @@ class Entity
 				$hash = $this->$fieldName;
 				if (strlen($hash)>0)
 				{
-					$row = $context->sql->fetchSingleRow("SELECT thumb FROM $dbName.uploads WHERE `hash` = '$hash'");	
+					$row = $context->database->fetchObject($dbName, 'uploads', "`hash` = '$hash'");	
 					$thumb = $row['thumb'];
 					//echo $hash; die();
 					$this->$fieldData = $thumb;					
@@ -97,41 +92,25 @@ class Entity
 	
 	public function save($context)
 	{	
+		$dbName = $this->dbName;
 		$tableName = $this->tableName;
 		
-		$query = "";
-		$fieldList = "";
-		$valueList = "";
-		$i = 0;
-		foreach($this->fields as $field) {
+		$dbFields = array();
+		foreach($this->fields as $field) 
+		{
 			$fieldName = $field->name;
-			$fieldType = $field->dbType;	
-			$fieldValue = $field->encodeValue($context, $this->$fieldName);
-									
-			if ($i>0)
-			{
-				$query .= ', ';
-				$fieldList .= ', ';
-				$valueList .= ', ';
-			}
-			
-			$query .= "$fieldName=$fieldValue";			
-			$fieldList .= $fieldName;
-			$valueList .= $fieldValue;
-			
-			$i++;
+			$fieldValue = $this->$fieldName;
+		
+			$dbFields[$fieldName] = $fieldValue;
 		}
 
 		if ($this->exists)
 		{
-			$query = "UPDATE $tableName SET $query WHERE id=".$this->id;	
-			$context->sql->query($query);
+			$context->database->saveObject($dbName, $tableName, $dbFields, 'id='.$this->id);
 		}
 		else
 		{			
-			$query = "INSERT INTO $tableName ($fieldList) VALUES($valueList)";	
-			$context->sql->query($query);
-			
+			$context->database->insertObject($dbName, $tableName, $dbFields);
 			$this->exists = true;
 		}		
 	}
@@ -141,9 +120,9 @@ class Entity
 		if ($this->exists)
 		{		
 			$tableName = $this->tableName;
+			$dbName = $this->dbName;
 		
-			$query = "DELETE FROM $tableName WHERE id=".$this->id;	
-			$context->sql->query($query);
+			$context->database->deleteAll($dbName, $tableName, 'id='.$this->id);
 			
 			$this->exists = false;
 			$this->id = 0;			

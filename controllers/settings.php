@@ -20,12 +20,11 @@ class SettingsController extends Controller {
 		}
 		$context->saveConfiguration();
 	   
-		if ($context->sql->failed)
+		if ($context->database->failed)
 		{
-			$context->sql = new SQL($context->config);
-			$context->database = new Database($context);		
+			$context->initDatabase();		
 			
-			if ($context->sql->failed)
+			if ($context->database->failed)
 			{
 				$context->warning = 'A configuração da base de dados está incorreta!';
 			}
@@ -42,7 +41,7 @@ class SettingsController extends Controller {
    {
 		$dbTab = array('name' => 'database', 'label'  => 'Base de Dados', 'active' => false, 'fields' => 'sqlPlugin,sqlHost,sqlUser,sqlPass,instanced');
 	   
-		if ($context->sql->failed)
+		if ($context->database->failed)
 		{
 		   $selectedTabName = 'database';		   
 		   $selectedTab = $dbTab;
