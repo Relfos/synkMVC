@@ -4,9 +4,15 @@ class SQL
 {
 	public $db;
 	
-	function __construct($config) {
-		$this->db = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass) or die($this->db->error);
-
+	function __construct($config) 
+	{
+		$this->db = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass);
+		if ($this->db->connect_error)  
+		{
+			$this->failed = true;
+			return;
+		}		
+				
 		if (!mysqli_set_charset($this->db, "utf8"))
 		{
 			die($this->db->error);
@@ -14,17 +20,31 @@ class SQL
 		
 		mb_internal_encoding('UTF-8');
 	}
-	
-	function selectDatabase($name)
+		
+	/*function selectDatabase($name)
 	{
+		if ($this->failed)
+		{
+			return;
+		}
 		mysqli_select_db($this->db, $name) or die($this->db->error);
-	}
+	}*/
 	
 	function query($query)
 	{
-		//echo $query."<br>";		
+		if ($this->failed)
+		{
+			return null;
+		}
+
+		//echo $query."<br>";		die();
 		$result = mysqli_query($this->db,$query);
-		if(!$result) die($this->db->error."<br>".$query);	
+		if(!$result) 
+		{
+			$this->failed = true;
+			die($this->db->error."<br>".$query);	
+			return null;						
+		}
 		return $result;
 	}
 	

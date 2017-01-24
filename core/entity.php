@@ -14,11 +14,12 @@ class Entity
 	
 	function __construct($context) {
 		$className = get_class($this);
+		$dbName = $context->databaseName;
 		
 		$customTable = strlen($this->tableName)>0;
 		if (!$customTable)
 		{
-			$tableName = strtolower($className."_data");
+			$tableName = $dbName.'.'.strtolower($className."_data");
 			$this->tableName = $tableName;			
 		}
 
@@ -74,7 +75,8 @@ class Entity
 	}
 	
 	public function expand($context)
-	{
+	{		
+		$dbName = $context->databaseName;
 		foreach($this->fields as $field) {
 			$fieldName = $field->name;			
 			
@@ -84,7 +86,7 @@ class Entity
 				$hash = $this->$fieldName;
 				if (strlen($hash)>0)
 				{
-					$row = $context->sql->fetchSingleRow("SELECT thumb FROM uploads WHERE `hash` = '$hash'");	
+					$row = $context->sql->fetchSingleRow("SELECT thumb FROM $dbName.uploads WHERE `hash` = '$hash'");	
 					$thumb = $row['thumb'];
 					//echo $hash; die();
 					$this->$fieldData = $thumb;					
@@ -135,7 +137,7 @@ class Entity
 	}
 	
 	public function remove($context)
-	{		
+	{	
 		if ($this->exists)
 		{		
 			$tableName = $this->tableName;

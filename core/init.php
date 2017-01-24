@@ -2,8 +2,8 @@
 require 'libs/Mustache/Autoloader.php';
 Mustache_Autoloader::register();
 
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
-//error_reporting(E_ERROR | E_PARSE);
+//error_reporting(E_ERROR | E_WARNING | E_PARSE);
+error_reporting(E_ERROR | E_PARSE);
 
 session_start();
 

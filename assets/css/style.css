@@ -572,3 +572,7 @@ text-transform: uppercase;
   text-align: left;
   vertical-align: middle;
 }
+
+#main {
+  min-height:100px;
+}

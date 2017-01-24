@@ -13,24 +13,23 @@ class Context {
 		$this->outputTarget = $this->loadVarFromRequest('target', 'main');
 		
 		$this->config = new Config();
-				
+		$this->sql = new SQL($this->config);
+
 		if ($this->hasLogin)
 		{
 			$databaseName = $this->loadVar('user_db', '');	
-			$this->sql = new SQL($this->config);
 			$this->sql->query('CREATE DATABASE IF NOT EXISTS '.$databaseName);
-			$this->sql->selectDatabase($databaseName);
-			
+									
 			$this->databaseName = $databaseName;
 			
-			$this->sql->query("CREATE TABLE IF NOT EXISTS enums (
+			$this->sql->query("CREATE TABLE IF NOT EXISTS $databaseName.enums (
 			`name` VARCHAR(30) NOT NULL,
 			`values` TEXT NOT NULL,
 			`keys` TEXT NOT NULL,
 			PRIMARY KEY (`name`)
 			) ENGINE=InnoDB DEFAULT CHARSET=utf8");
 			
-			$result = $this->sql->query("SELECT count(*) as total FROM enums;");
+			$result = $this->sql->query("SELECT count(*) as total FROM $databaseName.enums;");
 			$row = $this->sql->fetchRow($result);
 			if ($row['total'] == '0')
 			{
@@ -39,13 +38,24 @@ class Context {
 				require_once ('countries.php');
 				createCountriesEnum($this);
 			}					
-		}			
+		}	
+		else
+		{
+			$this->databaseName = $this->config->data;
+		}
 		
-		$this->database = new Database($this->config);
+		$this->database = new Database($this);		
 	}
 	
 	public function prepare()
 	{			
+		if ($this->sql->failed)
+		{
+			$this->hasLogin = false;
+			$this->changeModule('settings');	
+			return;
+		}			
+	
 		$module = $this->loadVar('module', 'auth');
 		$this->changeModule($module);
 		
@@ -59,13 +69,14 @@ class Context {
 		else
 		{
 			$this->filter = $this->loadVar('filter', null);	
-		}			
-		
-		$this->loadMenus();
+		}							
 	}
 	
 	public function execute($action)
 	{
+		$this->prepare();
+		$this->loadMenus();
+
 		ob_start();
 		$this->runController($action);
 		$html = ob_get_contents();
@@ -207,7 +218,8 @@ class Context {
 	
 	function fetchEnum($name)
 	{
-		$row = $this->sql->fetchSingleRow("SELECT `values`, `keys` FROM enums WHERE `name` = '$name'");			
+		$dbName = $this->databaseName;
+		$row = $this->sql->fetchSingleRow("SELECT `values`, `keys` FROM $dbName.enums WHERE `name` = '$name'");			
 		$temp  = $row['values'];
 		$names = explode("|", $temp);			
 		
@@ -343,11 +355,31 @@ class Context {
 		$this->filter = null;
 	}
 	
-	function log($text)
+	public function log($text)
 	{
 		file_put_contents($this->config->logFile, "$text\n", FILE_APPEND | LOCK_EX);	
 	}
 	
+	public function saveConfiguration()
+	{
+		$myfile = fopen("config.php", "w");
+		fwrite($myfile, "<?php\n");
+		fwrite($myfile, "class Config\n");
+		fwrite($myfile, "{\n");
+		foreach ($this->config as $key => $value) 
+		{
+			$isSimple = ($value == 'true' || $value == 'false' || is_numeric($value));
+			if (!$isSimple)
+			{
+				$value = "'$value'";
+			}
+			fwrite($myfile, "\tpublic \$$key = $value;\n");
+		}
+		fwrite($myfile, "}\n");
+		fwrite($myfile, "?>\n");
+		
+		fclose($myfile);		
+	}
 }
 
 

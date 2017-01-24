@@ -85,7 +85,7 @@ function navigate(module, action, otherArgs, targetDiv, ignoreState)
 				{
 					//alert('pushed sate');
 					window.history.pushState({"module": data.module, "action":action, "args": otherArgs}, "", data.module);	
-				}
+				}				
 			}
 		});		
 	return false;

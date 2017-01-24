@@ -17,8 +17,6 @@ $context->createModule('company')->setTitle('Empresa')->setMenu('Admin')->requir
 $context->createModule('connectors')->setTitle('Conectores')->setMenu('Admin')->requireAuth();
 $context->createModule('settings')->setTitle('Configuração')->setMenu('Admin')->requireAuth();
 
-$context->prepare();
-
 $action = $context->loadVarFromRequest('action', 'page');
 
 if (strcmp($action, 'page') === 0) {

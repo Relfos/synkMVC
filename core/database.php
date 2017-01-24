@@ -2,14 +2,24 @@
 
 class Database
 {	
-	function __construct($config) {
-		$sql = new SQL($config);
+	function __construct($context) {
+		$sql = $context->sql;
+		$config = $context->config;
+		
+		if ($sql->failed)
+		{
+			return;
+		}
 		
 		$dbName = $config->database;
 		$sql->query('CREATE DATABASE IF NOT EXISTS '.$dbName);
-		$sql->selectDatabase($dbName);
 		
-		$sql->query("CREATE TABLE IF NOT EXISTS users (
+		if ($sql->failed)
+		{
+			return;
+		}
+
+		$sql->query("CREATE TABLE IF NOT EXISTS $dbName.users (
 		`id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
 		`name` VARCHAR(30) NOT NULL,
 		`hash` VARCHAR(40) NOT NULL,
@@ -17,7 +27,7 @@ class Database
 		PRIMARY KEY (`id`)
 		) ENGINE = InnoDB;");
 
-		$result = $sql->query("SELECT count(*) as total FROM users;");
+		$result = $sql->query("SELECT count(*) as total FROM $dbName.users;");
 		$row = $sql->fetchRow($result);
 		if ($row['total'] == '0')
 		{
@@ -63,7 +73,8 @@ class Database
 		}
 
 		$tableName = $entity->tableName;
-		$query = "SELECT * FROM ".$tableName." WHERE $condition";
+		$dbName = $context->databaseName;
+		$query = "SELECT * FROM $tableName WHERE $condition";
 
 		$row = $context->sql->fetchSingleRow($query);
 		
@@ -83,9 +94,9 @@ class Database
 		$templateEntity = $this->createEntity($context, $name);
 		
 		$tableName =  $templateEntity->tableName;
+		$dbName = $context->databaseName;
 		
-		
-		$query = "SELECT * FROM ".$tableName;
+		$query = "SELECT * FROM $tableName";
 		if ($condition != null && strlen(condition)>0)
 		{
 			$query .= " WHERE ".$condition;
@@ -120,6 +131,7 @@ class Database
 	{					
 		$templateEntity = $this->createEntity($context, $name);
 		$tableName =  $templateEntity->tableName;
+		$dbName = $context->databaseName;
 				
 		$query = "SELECT count(*) as total FROM ".$tableName;
 		if ($condition != null && strlen(condition)>0)

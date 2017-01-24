@@ -28,11 +28,11 @@ function make_thumb($src)
 	return $imageString;
 }
 
-function upload_file($sql, $fileName, $tempName)
+function upload_file($dbName, $sql, $fileName, $tempName)
 {
 	$hash = md5_file($tempName);
 
-	$result = $sql->query("SELECT count(*) as total FROM uploads where `hash` = '$hash'");
+	$result = $sql->query("SELECT count(*) as total FROM $dbName.uploads where `hash` = '$hash'");
 	$row = $sql->fetchRow($result);
 	if ($row['total'] == '0')
 	{
@@ -46,7 +46,7 @@ function upload_file($sql, $fileName, $tempName)
 		
 		file_put_contents("dump.txt", $data);
 		
-		$sql->query("INSERT INTO uploads (`hash`, `data`, `name`, `size`, `thumb`, `thumbsize`) VALUES ('$hash', '$data', '$fileName', $size, '$thumb', $thumbsize)");	
+		$sql->query("INSERT INTO $dbName.uploads (`hash`, `data`, `name`, `size`, `thumb`, `thumbsize`) VALUES ('$hash', '$data', '$fileName', $size, '$thumb', $thumbsize)");	
 		
 		//move_uploaded_file($tempName, $destFile);	
 		$skipped = false;
@@ -74,9 +74,8 @@ else
 	$dbName = $config->database;	
 }
 
-$sql->selectDatabase($dbName);
 
-$sql->query("CREATE TABLE IF NOT EXISTS uploads (
+$sql->query("CREATE TABLE IF NOT EXISTS $dbName.uploads (
 `hash` VARCHAR(40) NOT NULL,
 `name` VARCHAR(60) NOT NULL,
 `data` MEDIUMTEXT NOT NULL,
@@ -96,14 +95,14 @@ if(isset($_FILES["target"]))
 	//If Any browser does not support serializing of multiple files using FormData() 
 	if(!is_array($_FILES["target"]["name"])) //single file
 	{
-		$ret[] = upload_file($sql, $_FILES["target"]["name"], $_FILES["target"]["tmp_name"]);
+		$ret[] = upload_file($dbName, $sql, $_FILES["target"]["name"], $_FILES["target"]["tmp_name"]);
 	}
 	else  //Multiple files, file[]
 	{
 	  $fileCount = count($_FILES["target"]["name"]);
 	  for($i=0; $i < $fileCount; $i++)
 	  {
-		  $ret[] = upload_file($sql, $_FILES["target"]["name"][$i], $_FILES["target"]["tmp_name"][$i]);
+		  $ret[] = upload_file($dbName, $sql, $_FILES["target"]["name"][$i], $_FILES["target"]["tmp_name"][$i]);
 	  }	
 	}
 	
