@@ -2,6 +2,7 @@
 		<table class="table table-hover">
 		 <thead>
 		  <tr>
+			<th></th>
 			<th>Entidade</th>
 		  </tr>
 		 </thead>	 
@@ -9,6 +10,7 @@
 		 <tbody>
 			{{#modelList}}
 			 <tr>
+				<td><a href="#" onclick="clearEntity('{{title}}', '{{module}}', '{{name}}');" class="btn btn-theme small_btn">Limpar</a></td>
 				<td>{{title}}</td>				
 			 </tr>
 			{{/modelList}}
@@ -16,3 +18,20 @@
 		 </tbody>
 		</table>
 	</div>
+
+<script>
+function clearEntity(title, module, entity)
+{
+	bootbox.confirm("Não será possivél voltar atrás.<br>Tem a certeza que quer apagar todos os dados do módulo "+title+"?", function(val)
+		{
+			if (val == true)
+			{
+				synkNav().setModule(module).setAction('clear').setArgs('class='+entity).onFinish(
+						function() {
+							bootbox.alert('Os dados do módulo '+title+' foram apagados.');
+						}
+					).call();		
+			}		
+		});	
+}
+</script>

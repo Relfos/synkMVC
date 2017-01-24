@@ -13,7 +13,6 @@ $context->createModule('categories')->setTitle('Categorias')->setMenu('Modulos')
 $context->createModule('products')->setTitle('Produtos')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('product');	
 $context->createModule('documents')->setTitle('Documentos')->setMenu('Modulos')->requireAuth()->setDefaultAction('grid')->setEntity('document');
 
-$context->createModule('company')->setTitle('Empresa')->setMenu('Admin')->requireAuth();
 $context->createModule('connectors')->setTitle('Conectores')->setMenu('Admin')->requireAuth();
 $context->createModule('settings')->setTitle('Configuração')->setMenu('Admin')->requireAuth();
 

@@ -53,17 +53,18 @@ class SettingsController extends Controller {
 			$_SESSION['tab'] = $selectedTabName;		   
 			
 			$tabs = array();
-			$tabs[] = array('name' => 'system', 'label'  => 'Sistema', 'active' => false, 'fields' => '');
+			$tabs[] = array('name' => 'company', 'label'  => 'Empresa', 'active' => false, 'fields' => '');
 			$tabs[] = $dbTab;
 			$tabs[] = array('name' => 'entities', 'label'  => 'Entidades', 'active' => false, 'fields' => '');
 			$tabs[] = array('name' => 'plugins', 'label'  => 'Plugins', 'active' => false, 'fields' => '');			
+			$tabs[] = array('name' => 'system', 'label'  => 'Sistema', 'active' => false, 'fields' => '');
 
 	   		$entities = array();
 			foreach($context->modules as $module) 
 			{
 			   if ($module->entity)
 			   {
-				   $entities[] = array('title' => $module->title, 'name' => $module->entity);
+				   $entities[] = array('title' => $module->title, 'name' => $module->entity, 'module' => $module->name);
 			   }
 			}
 			$context->modelList = $entities;

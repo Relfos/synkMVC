@@ -80,6 +80,16 @@ class ModelController extends Controller {
 		$this->render($context);
 	}
 
+	public function clear($context)
+	{
+		$id = $_REQUEST['id'];
+		$entityClass = $_REQUEST['class'];
+
+		//var_dump($_REQUEST); die();
+	   
+		$context->database->clearEntities($context, $entityClass);	   
+	}
+
 	public function upload($context)
 	{
 		var_dump($_FILES);

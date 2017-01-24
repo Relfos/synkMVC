@@ -50,22 +50,22 @@ class Database
 		}			
 	}
 	
-	public function createEntity($context, $name)
+	public function createEntity($context, $entityClass)
 	{
-		require_once('model/'.$name.'.php');
-		$className = ucfirst($name);
+		require_once('model/'.$entityClass.'.php');
+		$className = ucfirst($entityClass);
 		$result = new $className($context);
 		return $result;
 	}
 	
-	public function fetchEntityByID($context, $name, $id) 
+	public function fetchEntityByID($context, $entityClass, $id) 
 	{
-		return $this->fetchEntity($context, $name, "id=$id");
+		return $this->fetchEntity($context, $entityClass, "id=$id");
 	}
 	
-    public function fetchEntity($context, $name, $condition)
+    public function fetchEntity($context, $entityClass, $condition)
 	{	
-		$entity = $this->createEntity($context, $name);
+		$entity = $this->createEntity($context, $entityClass);
 		
 		if (is_null($condition))
 		{
@@ -73,7 +73,6 @@ class Database
 		}
 
 		$tableName = $entity->tableName;
-		$dbName = $context->databaseName;
 		$query = "SELECT * FROM $tableName WHERE $condition";
 
 		$row = $context->sql->fetchSingleRow($query);
@@ -87,14 +86,13 @@ class Database
 		return $entity;
     }
 		
-    public function fetchAllEntities($context, $name, $condition, $pagination) {
+    public function fetchAllEntities($context, $entityClass, $condition, $pagination) {
 		
 		$entities = array();
 				
-		$templateEntity = $this->createEntity($context, $name);
+		$templateEntity = $this->createEntity($context, $entityClass);
 		
 		$tableName =  $templateEntity->tableName;
-		$dbName = $context->databaseName;
 		
 		$query = "SELECT * FROM $tableName";
 		if ($condition != null && strlen(condition)>0)
@@ -118,7 +116,7 @@ class Database
 		$result = $context->sql->query($query);
 		
 		while ($row = $context->sql->fetchRow($result)) {
-			$entity = $this->createEntity($context, $name);
+			$entity = $this->createEntity($context, $entityClass);
 			$entity->loadFromRow($row);
 			$entity->expand($context);
 			$entities[] = $entity;
@@ -127,12 +125,11 @@ class Database
 		return $entities;
     }
 	
-    public function getEntityCount($context, $name, $condition) 
+    public function getEntityCount($context, $entityClass, $condition) 
 	{					
-		$templateEntity = $this->createEntity($context, $name);
+		$templateEntity = $this->createEntity($context, $entityClass);
 		$tableName =  $templateEntity->tableName;
-		$dbName = $context->databaseName;
-				
+
 		$query = "SELECT count(*) as total FROM ".$tableName;
 		if ($condition != null && strlen(condition)>0)
 		{
@@ -147,6 +144,20 @@ class Database
 		
 		return intval($row['total']);
     }
+	
+	public function clearEntities($context, $entityClass, $condition)
+	{
+		$templateEntity = $this->createEntity($context, $entityClass);
+		$tableName =  $templateEntity->tableName;
+		
+		$query = "DELETE FROM ".$tableName;
+		if ($condition != null && strlen(condition)>0)
+		{
+			$query .= " WHERE ".$condition;
+		}
+		
+		$context->sql->query($query);
+	}
 
 	function getPasswordHash($password)
 	{

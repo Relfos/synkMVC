@@ -87,6 +87,7 @@ function synkNav()
 		target : undefined,
 		otherArgs : undefined,
 		skipHistory : undefined,
+		isNavigation: true,
 		isDownload: undefined,
 		progressBar: undefined,
 		finishCallback : undefined,
@@ -121,15 +122,18 @@ function synkNav()
 			window.URL.revokeObjectURL(url);			
 			return;			
 		}
-	
-		$('#'+data.target).html(data.content);
-		$('#title').html(data.title);
-
-		if (!this.skipHistory && this.mainNavigation)
+		else
+		if (this.isNavigation)
 		{
-			//alert('pushed sate');
-			window.history.pushState({"module": data.module, "action":this.action, "args": this.otherArgs}, "", data.module);	
-		}						
+			$('#'+data.target).html(data.content);
+			$('#title').html(data.title);
+
+			if (!this.skipHistory && this.mainNavigation)
+			{
+				//alert('pushed sate');
+				window.history.pushState({"module": data.module, "action":this.action, "args": this.otherArgs}, "", data.module);	
+			}									
+		}	
 	};
 	
 	nav.download = function() {
@@ -137,6 +141,11 @@ function synkNav()
 		return this.go();
 	}
 	
+	nav.call = function() {
+		this.isNavigation = false;
+		return this.go();
+	}
+
 	nav.go = function() {
 		var that = this;
 
