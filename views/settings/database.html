@@ -1,0 +1,20 @@
+  <div class="form-group">
+	<label for="plugin">Plugin</label>
+	<select class="form-control" id="{{name}}">
+		<option value='mysql' {{#selected}}selected="selected"{{/selected}}>mysql</option>
+	</select>		
+  </div>
+
+  <div class="form-group">
+	<label for="host">Host</label>
+	<input type="host" class="form-control" id="email" value="{{config.host}}">
+  </div>
+  <div class="form-group">
+	<label for="username">Username</label>
+	<input type="username" class="form-control" id="email" value="{{config.user}}">
+  </div>
+  <div class="form-group">
+	<label for="password">Password</label>
+	<input type="password" class="form-control" id="password" value="{{config.pass}}">
+  </div>
+  <button type="button" class="btn btn-theme" onclick="navigate('current', 'login',  gather('email,password'))">Login</button>

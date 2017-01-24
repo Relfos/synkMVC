@@ -1,0 +1,12 @@
+<ul class="nav nav-tabs">
+	{{#tabs}}
+	<li {{#active}}class="active"{{/active}}><a href="#" onclick="navigate('current', 'page', 'tab={{name}}');">{{label}}</a></li>
+	{{/tabs}}
+</ul>
+<h4>{{selectedTab.label}}</h4>
+<div class="hline"></div>
+	{{#warning}}
+	<p class="error">{{warning}}</p>
+	{{/warning}}
+<br>
+	<form role="form" action="#">$body</form>

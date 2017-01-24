@@ -22,8 +22,8 @@ $context->prepare();
 $action = $context->loadVarFromRequest('action', 'page');
 
 if (strcmp($action, 'page') === 0) {
-	$context->hasBody = true;
-	$context->hasHeader = true;
+	$context->pushTemplate('views/header');
+	$context->pushTemplate('views/body');
 	$action = 'render';
 
 }

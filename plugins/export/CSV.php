@@ -4,7 +4,7 @@ class CSVPlugin
 {	
 	function __construct($context) {
 	}
-	
+		
 	public function export($context, $entityClass)
 	{
 		$progress = new ProgressBar();

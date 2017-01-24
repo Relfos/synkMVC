@@ -23,37 +23,38 @@ class Controller {
 
    public function render($context)
    {
-		$viewFile = $context->curView.'.html';
+		$viewFile = $context->curView;
 		$viewPath = 'views/'. $context->module->name.'/'.$viewFile;
 	   
-		if (!file_exists($viewPath))
+		if (!file_exists($viewPath.'.html'))
 		{
 			$viewPath = 'views/common/'. $viewFile;
 		}
 		
-		if (!file_exists($viewPath))
+		
+		if (!file_exists($viewPath.'.html'))
 		{
-			$moduleTemplate = "Could not load view '".$context->curView."' for ".$context->module->name;			
+			$layoutTemplate = "Could not load view '".$context->curView."' for ".$context->module->name;			
 		}
 		else
 		{
-			$moduleTemplate = file_get_contents($viewPath);			
+			$layoutTemplate = '';
+			$context->pushTemplate($viewPath);			
 		}
-		      
-		$layoutTemplate = $moduleTemplate;
+		      		
+		$layoutTemplate = '';
+		
+		//var_dump($context->templateStack); die();
 	  
-		if ($context->hasBody)
+		$total = count($context->templateStack);
+		for ($i=$total-1; $i>=0; $i--)
 		{			
-			$body = file_get_contents('views/body.html');
+			$fileName = $context->templateStack[$i].'.html';
+			$body = file_get_contents($fileName);
+			
 			$layoutTemplate = str_replace('$body', $layoutTemplate, $body);	
 		}
-		
-		if ($context->hasHeader)
-		{
-			$header = file_get_contents('views/header.html');
-			$layoutTemplate = str_replace('$body', $layoutTemplate, $header);	
-		}
-				
+						
 		if (strpos($layoutTemplate, '{{#grid.') !== false) {
 			$this->loadGrid($context);
 		}	   
@@ -229,13 +230,14 @@ class Controller {
 		{
 			$pages = null;
 		}
-		
-		$exports = array(
-			array('format' => 'excel', 'label' => 'Excel'),
-			array('format' => 'CVS', 'label' => 'CSV'),
-			array('format' => 'XML', 'label' => 'XML'),
-			array('format' => 'json', 'label' => 'JSON')
-			);
+	
+		$exports = array();
+		foreach (glob('plugins/export/*.php') as $file) 
+		{
+			$extensionName = pathinfo($file, PATHINFO_FILENAME);
+			require_once($file);
+			$exports[] = array('format' => $extensionName, 'label' => $extensionName);
+		}	
 		
 		$grid = array (
 		  'headers' => $headers,		  

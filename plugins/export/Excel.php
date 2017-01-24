@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__.'/../libs/PHPExcel.php';
+require_once 'libs/PHPExcel.php';
 	
 class ExcelPlugin
 {	
@@ -35,8 +35,8 @@ class ExcelPlugin
 		foreach($entity->fields as $field) {
 			if (!$field->hidden)
 			{
-				$i++;
 				$sheet->setCellValue($this->num2alpha($i).'1', $field->label);
+				$i++;
 			}			
 		}
 		
@@ -51,11 +51,10 @@ class ExcelPlugin
 			foreach($entity->fields as $field) {
 				if (!$field->hidden)
 				{
-					$j++;
 					$fieldName = $field->name;
 					$fieldValue = $entity->$fieldName;	
 					$sheet->setCellValue($this->num2alpha($j).$i, $fieldValue);
-					
+					$j++;					
 				}			
 			}
 

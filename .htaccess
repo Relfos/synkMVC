@@ -6,3 +6,4 @@ RewriteRule clients index.php?module=clients
 RewriteRule products index.php?module=products
 RewriteRule users index.php?module=users
 RewriteRule documents index.php?module=documents
+RewriteRule settings index.php?module=settings

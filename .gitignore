@@ -2,3 +2,4 @@ demos/
 .DS_Store
 tmp/
 log.txt
+demos_template/

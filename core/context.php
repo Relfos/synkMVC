@@ -4,8 +4,7 @@ class Context {
     public $hasLogin = false;  
 	public $entityID = null;
 	public $outputTarget;
-	public $hasBody = false;
-	public $hasHeader = false;
+	public $templateStack = array();
 	
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);		
@@ -247,6 +246,7 @@ class Context {
 		}
 		
 		$_SESSION['module'] = $module;		
+		$_SESSION['page'] = 1;
 		
 		$this->changeView($this->module->defaultAction);
 	}
@@ -275,7 +275,12 @@ class Context {
 	function reload()
 	{
 		$this->outputTarget = 'body_content';
-		$this->hasBody = true;
+		$this->pushTemplate('views/body');
+	}
+	
+	public function pushTemplate($fileName)
+	{
+		$this->templateStack[] = $fileName;		
 	}
 
 	function loadVar($name, $defaultValue)

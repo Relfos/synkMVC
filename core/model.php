@@ -158,7 +158,7 @@ class ModelController extends Controller {
 		$entityClass = $_REQUEST['class'];
 		$format = $_REQUEST['format'];
 				
-		$pluginFile = 'plugins/'.$format.'.php';
+		$pluginFile = 'plugins/export/'.$format.'.php';
 		if (file_exists($pluginFile))
 		{
 			require_once($pluginFile);	

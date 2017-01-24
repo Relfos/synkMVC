@@ -8,10 +8,13 @@ error_reporting(E_ERROR | E_WARNING | E_PARSE);
 session_start();
 
 
+require_once('config.php');
+
+$config = new Config();
+
 require_once('core/utils.php');
-require_once('core/config.php');
 require_once('core/context.php');
-require_once('core/sql.php');
+require_once('plugins/database/'.$config->sqlPlugin.'.php');
 require_once('core/database.php');
 require_once('core/entity.php');
 require_once("core/module.php");
