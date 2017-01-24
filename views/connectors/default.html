@@ -17,5 +17,5 @@
 		<label for="company">Empresa</label>
 		<input type="text" class="form-control" id="company" value="{{config.synkCompany}}">
 	  </div>
-	  <button type="button" class="btn btn-theme" onclick="navigate('current', 'login',  gather('email,password,company'))">Login</button>
+	  <button type="button" class="btn btn-theme" onclick="synkNav().setAction('login').setArgs(gather('email,password,company')).go();">Login</button>
 	</form>

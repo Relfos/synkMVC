@@ -82,7 +82,7 @@ class Context {
 		$html = ob_get_contents();
 		ob_end_clean();
 
-		if (isset($_REQUEST['json']))
+		if (isset($_REQUEST['json']) && !$this->isDownload)
 		{
 			$json_array=array(
 			'target' => $this->outputTarget,
@@ -165,7 +165,7 @@ class Context {
 	{
 		$this->menus = array();
 		
-		$this->menus[] = array('title' => 'Dashboard', 'link' => "navigate('dashboard')");
+		$this->menus[] = array('title' => 'Dashboard', 'link' => "synkNav().setModule('dashboard').go();");
 
 		foreach($this->modules as $module) 
 		{
@@ -259,6 +259,8 @@ class Context {
 		
 		$_SESSION['module'] = $module;		
 		$_SESSION['page'] = 1;
+		
+		$this->removeFilters();
 		
 		$this->changeView($this->module->defaultAction);
 	}
@@ -380,6 +382,43 @@ class Context {
 		
 		fclose($myfile);		
 	}
+	
+	public function sendDownload($fileName, $data, $mimeType)
+	{
+		$this->isDownload = true;
+		
+		if (is_null($mimeType))
+		{
+			$mimeType = 'application/octet-stream';
+		}
+		
+		$size = strlen($data);
+		
+		if (isset($_REQUEST['json']))
+		{
+			$data = base64_encode($data);
+			echo
+	"{
+		\"mimetype\": \"$mimeType\",
+		\"filename\": \"$fileName\",
+		\"content\": \"$data\"
+	}";		
+		}
+		else
+		{
+			header('Content-Description: File Transfer');
+			header('Content-Type: '.$mimeType);
+			header('Content-Disposition: attachment; filename=' . $fileName); 
+			header('Content-Transfer-Encoding: binary');
+			header('Connection: Keep-Alive');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
+			header('Pragma: public');
+			header('Content-Length: ' . $size);			
+			echo $data;			
+		}	
+	}
+	
 }
 
 

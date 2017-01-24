@@ -55,7 +55,7 @@ class jsonPlugin
 		$output = ob_get_clean();
 		
 		$fileName = $entityClass.'_list.json';	
-		sendDownload($fileName, $output, null);
+		$context->sendDownload($fileName, $output, null);
 	}		
 }
 	

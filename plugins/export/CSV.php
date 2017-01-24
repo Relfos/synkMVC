@@ -49,7 +49,7 @@ class CSVPlugin
 		$output = ob_get_clean();
 		
 		$fileName = $entityClass.'_list.csv';	
-		sendDownload($fileName, $output, null);
+		$context->sendDownload($fileName, $output, null);
 	}		
 }
 	

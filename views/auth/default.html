@@ -13,5 +13,5 @@
 		<label for="password">Password</label>
 		<input type="password" class="form-control" id="password">
 	  </div>
-	  <button type="button" class="btn btn-theme" onclick="navigate('current', 'login',  gather('email,password'))">Login</button>
+	  <button type="button" class="btn btn-theme" onclick="synkNav().setAction('login').setArgs(gather('email,password')).go();">Login</button>
 	</form>

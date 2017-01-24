@@ -9,7 +9,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="#" {{#hasLogin}}onclick="navigate('dashboard')" {{/hasLogin}}><img src="assets/img/logo.png" /></a>
+          <a class="navbar-brand" href="#" {{#hasLogin}}onclick="synkNav().setModule('dashboard').go();" {{/hasLogin}}><img src="assets/img/logo.png" /></a>
         </div>
 			
         <div class="navbar-collapse collapse navbar-right">
@@ -36,7 +36,7 @@
 				{{/items}}
 			{{/menus}}
 										
-			<li><a href="#" onclick="navigate('auth','logout')">Sair</a></li>
+			<li><a href="#" onclick="synkNav().setModule('auth').setAction('logout').go();">Sair</a></li>
 {{/hasLogin}}		
 
 			</ul>

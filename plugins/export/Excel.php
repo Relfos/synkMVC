@@ -67,7 +67,7 @@ class ExcelPlugin
 		$excelOutput = ob_get_clean();
 		
 		$fileName = $entityClass.'_list.xlsx';
-		sendDownload($fileName, $excelOutput, null);
+		$context->sendDownload($fileName, $excelOutput, null);
 	}		
 }
 	

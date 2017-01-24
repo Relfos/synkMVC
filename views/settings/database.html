@@ -17,3 +17,9 @@
 	<label for="pass">Password</label>
 	<input type="password" class="form-control" id="sqlPass" value="{{config.sqlPass}}">
   </div>
+
+  <div class="form-group">
+	<div class="checkbox">
+	<label><input type="checkbox" value="" id="instanced" {{#config.instanced}}checked="true"{{/config.instanced}}>Instanciar por User</label>
+	</div>
+  </div>

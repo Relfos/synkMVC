@@ -44,7 +44,7 @@ class Module
 
 	public function getLink()
 	{
-		return "navigate('".$this->name."')";
+		return "synkNav().setModule('".$this->name."').go();";
 	}
 }
 

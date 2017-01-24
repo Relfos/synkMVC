@@ -1,8 +1,10 @@
+{{#tabs.0}}
 <ul class="nav nav-tabs">
 	{{#tabs}}
-	<li {{#active}}class="active"{{/active}}><a href="#" onclick="navigate('current', 'render', 'tab={{name}}');">{{label}}</a></li>
+	<li {{#active}}class="active"{{/active}}><a href="#" onclick="synkNav().setArgs('tab={{name}}').go();">{{label}}</a></li>
 	{{/tabs}}
 </ul>
+{{/tabs.0}}
 <h4>{{selectedTab.label}}</h4>
 <div class="hline"></div>
 	{{#warning}}
@@ -11,8 +13,21 @@
 <br>
 	<form role="form" action="#">$body
 	<br>
+	{{#selectedTab.fields}}
 	<div class="form-group">
-		<button type="button" class="btn btn-theme" onclick="navigate('current', 'save',  gather('{{selectedTab.fields}}'))">Save</button>
+		<button type="button" class="btn btn-theme" onclick="saveData();">Save</button>
 	</div>
 	</form>	
+	
+	<script>
+	function saveData()
+	{
+		synkNav().setAction('save').setArgs(gather('{{selectedTab.fields}}')).onFinish(
+			function() {
+				bootbox.alert('A informação foi guardada!');
+			}
+		).go();		
+	}	
+	</script>
+	{{/selectedTab.fields}}
   

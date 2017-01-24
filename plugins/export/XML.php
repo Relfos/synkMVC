@@ -45,7 +45,7 @@ class XMLPlugin
 		$output = ob_get_clean();
 		
 		$fileName = $entityClass.'_list.xml';	
-		sendDownload($fileName, $output, null);
+		$context->sendDownload($fileName, $output, null);
 	}		
 }
 	

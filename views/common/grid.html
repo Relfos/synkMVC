@@ -3,7 +3,7 @@
 	<div class="col-md-12 text-center">
 		<ul class="pagination">
 		  {{#grid.pages}}
-		  <li {{#disabled}}class="disabled"{{/disabled}}{{#selected}}class="active"{{/selected}}><a href="#" onclick="navigate('current', 'paginate', 'page={{id}}')">{{id}}{{#selected}}<span class="sr-only">(current)</span>{{/selected}}</a></li>
+		  <li {{#disabled}}class="disabled"{{/disabled}}{{#selected}}class="active"{{/selected}}><a href="#" onclick="synkNav().setAction('paginate').setArgs('page={{id}}').go();">{{id}}{{#selected}}<span class="sr-only">(current)</span>{{/selected}}</a></li>
 		  {{/grid.pages}}
 		</ul>
 	</div>
@@ -38,7 +38,6 @@
 					{{/visible}}
 				{{/columns }}	
 
-				<!--<td><a href="#" onclick="navigate('current', 'edit', 'id={{rowID}}')" class="btn btn-theme small_btn">Editar</a></td> -->
 				<td><a href="#" onclick="editEntity('{{rowID}}');" class="btn btn-theme small_btn">Editar</a></td>
 			  </tr>
 			{{/grid.rows}}
@@ -57,7 +56,7 @@
 		
 		<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">Filtrar</button>
 		{{#filter}}
-		<button type="button" class="btn btn-theme" onclick="navigate('current', 'unfilter')">Limpar</button>
+		<button type="button" class="btn btn-theme" onclick="synkNav().setAction('unfilter').go();">Limpar</button>
 		{{/filter}}
 		</form>
 	</div>
@@ -79,7 +78,7 @@
 			<table class="table table-hover">		
 				{{#grid.exports}}
 				<tr><td class="col-xs-8">{{label}}</td>
-				<td class="col-xs-4"><a href="#" onclick="downloadFile('exportProgress', 'current', 'export', 'format={{format}}&class={{module.entity}}')" class="btn btn-theme small_btn">Exportar</a></td>
+				<td class="col-xs-4"><a href="#" onclick="synkNav().setProgressBar('exportProgress').setAction('export').setArgs('format={{format}}&class={{module.entity}}').download();" class="btn btn-theme small_btn">Exportar</a></td>
 				{{/grid.exports}}
 			</table>
 			<div class="progress">
@@ -126,7 +125,7 @@
 	{
 		currentEntityID = id;
 		$('#edit_content').html('...');
-		navigate('current', 'edit', 'id='+id, 'edit_content');
+		synkNav().setAction('edit').setArgs('id='+id).setTarget('edit_content').go();
 		$('#editModal').modal('show');	
 	}
 
@@ -150,7 +149,7 @@
 			//alert(fields);
 					
 			$('#editModal').one('hidden.bs.modal', function(){
-					navigate('current', 'save', 'id='+id+'&class='+className+'&'+gather(fields));
+					synkNav().setAction('save').setArgs('id='+id+'&class='+className+'&'+gather(fields)).go();
 				}).modal('hide');			
 			
 		});
@@ -165,7 +164,7 @@
 			if (val == true)
 			{
 				$('#editModal').one('hidden.bs.modal', function(){
-					navigate('current', 'remove', 'id='+id+'&class='+className);
+					synkNav().setAction('remove').setArgs('id='+id+'&class='+className).go();
 				}).modal('hide');	
 			}		
 		});	
@@ -174,7 +173,7 @@
 	function searchEntity()
 	{
 		$('#searchModal').one('hidden.bs.modal', function(){
-			navigate('current', 'filter', 'class={{module.entity}}&'+gather('field_name,field_value'));
+			synkNav().setAction('filter').setArgs('class={{module.entity}}&'+gather('field_name,field_value')).go();
 		}).modal('hide');	
 	}
 	</script>

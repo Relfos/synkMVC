@@ -1,3 +1,24 @@
+function base64ToBlob(base64, mimetype, slicesize) {
+    if (!window.atob || !window.Uint8Array) {
+        // The current browser doesn't have the atob function. Cannot continue
+        return null;
+    }
+    mimetype = mimetype || '';
+    slicesize = slicesize || 512;
+    var bytechars = atob(base64);
+    var bytearrays = [];
+    for (var offset = 0; offset < bytechars.length; offset += slicesize) {
+        var slice = bytechars.slice(offset, offset + slicesize);
+        var bytenums = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+            bytenums[i] = slice.charCodeAt(i);
+        }
+        var bytearray = new Uint8Array(bytenums);
+        bytearrays[bytearrays.length] = bytearray;
+    }
+    return new Blob(bytearrays, {type: mimetype});
+};
+
 function gather(argList)
 {
 	var args = '';
@@ -47,50 +68,6 @@ function gather(argList)
 	return args;
 }
 
-function navigate(module, action, otherArgs, targetDiv, ignoreState)
-{	
-	if (!action)
-	{
-		action = 'render';
-	}
-	
-	var mainNavigation = false;
-	
-	if (!targetDiv)
-	{
-		mainNavigation = true;
-		targetDiv = 'main';
-	}
-	
-	var args = 'module='+module+'&action='+action+'&target='+targetDiv;
-		
-	if (otherArgs)
-	{
-		args = args + '&'+otherArgs;
-	}
-	
-		
-	var targetURL = 'index.php?json=true&'+args;
-		
-	$.ajax({
-			url: targetURL,
-			type:'POST',
-			success: function(data)
-			{	
-				data =  $.parseJSON(data);				
-				$('#'+data.target).html(data.content);
-				$('#title').html(data.title);
-
-				if (!ignoreState && mainNavigation)
-				{
-					//alert('pushed sate');
-					window.history.pushState({"module": data.module, "action":action, "args": otherArgs}, "", data.module);	
-				}				
-			}
-		});		
-	return false;
-}
-
 function getProgress(module, fn)
 {		
 	$.ajax({
@@ -102,97 +79,174 @@ function getProgress(module, fn)
 	});	
 }
 
-function waitForOperation(progressBar, fn)
-{
-	var progressBar = $('#'+progressBar);
-	var percent = 0;
-	progressBar.css('width', '0');	
-	
-	var timerID = setInterval(function()
-	{
-		getProgress('current', function(val)
-			{
-				percent = val;	
-				
-				if (percent>=100)
-				{
-					percent = 100;
-					clearInterval(timerID);				
-					if (fn)
-					{
-						fn();
-					}					
-				}				
-				
-				var p = percent+'%';
-				console.log(p);
-				progressBar.css('width', p);	
-			});
-
-	} , 1000);
-}
-
-function waitThenNavigate(progressBar, module, action, otherArgs)
-{
-	navigate(module, action, otherArgs);
-	waitForOperation(progressBar);
-}
-
-function base64ToBlob(base64, mimetype, slicesize) {
-    if (!window.atob || !window.Uint8Array) {
-        // The current browser doesn't have the atob function. Cannot continue
-        return null;
-    }
-    mimetype = mimetype || '';
-    slicesize = slicesize || 512;
-    var bytechars = atob(base64);
-    var bytearrays = [];
-    for (var offset = 0; offset < bytechars.length; offset += slicesize) {
-        var slice = bytechars.slice(offset, offset + slicesize);
-        var bytenums = new Array(slice.length);
-        for (var i = 0; i < slice.length; i++) {
-            bytenums[i] = slice.charCodeAt(i);
-        }
-        var bytearray = new Uint8Array(bytenums);
-        bytearrays[bytearrays.length] = bytearray;
-    }
-    return new Blob(bytearrays, {type: mimetype});
-};
-
-function downloadFile(progressBar, module, action, otherArgs)
+function synkNav()
 {	
-	var args = 'module='+module+'&action='+action;
+	var nav = {
+		module : 'current',
+		action : 'render',
+		target : undefined,
+		otherArgs : undefined,
+		skipHistory : undefined,
+		isDownload: undefined,
+		progressBar: undefined,
+		finishCallback : undefined,
+		failCallback : undefined
+	};
+  
+	nav.setModule = function (module) { this.module = module; return this; };	
+	nav.setAction = function (action) { this.action = action; return this; };	
+	nav.setTarget = function (target) { this.target = target; return this; };	
+	nav.setProgressBar = function (bar) { this.progressBar = bar; return this; };	
+	nav.setArgs = function (args) { this.otherArgs = args; return this; };	
+	nav.ignoreHistory = function () { this.skipHistory = true; return this; };	
+	nav.onFinish = function (fn) { this.finishCallback = fn; return this; };	
+	nav.onFail = function (fn) { this.failCallback = fn; return this; };	
+	nav.complete = function()
+	{
+		if (this.finishCallback)
+		{
+			this.finishCallback();
+		}
 		
-	if (otherArgs)
-	{
-		args = args + '&'+otherArgs;
-	}
+		var data = this.data; 
+			
+		if (this.isDownload)
+		{
+			var blob = base64ToBlob(data.content, data.mimetype);
+			var url = window.URL.createObjectURL(blob);
+			var a = this.anchor;
+			a.href = url;
+			a.download = data.filename;
+			a.click();
+			window.URL.revokeObjectURL(url);			
+			return;			
+		}
+	
+		$('#'+data.target).html(data.content);
+		$('#title').html(data.title);
 
-	var a = document.createElement('a');
-	if (window.URL && window.Blob && ('download' in a) && window.atob) {
-		// Do it the HTML5 compliant way		
-		args = args + '&ajax';
-		$.ajax({
-			url: 'index.php?'+args,
-			type:'GET',
-			success: function(data){		
-				var result = $.parseJSON(data); 
-				var blob = base64ToBlob(result.data, result.mimetype);
-				var url = window.URL.createObjectURL(blob);
-				a.href = url;
-				a.download = result.filename;
-				a.click();
-				window.URL.revokeObjectURL(url);
+		if (!this.skipHistory && this.mainNavigation)
+		{
+			//alert('pushed sate');
+			window.history.pushState({"module": data.module, "action":this.action, "args": this.otherArgs}, "", data.module);	
+		}						
+	};
+	
+	nav.download = function() {
+		this.isDownload = true;
+		return this.go();
+	}
+	
+	nav.go = function() {
+		var that = this;
+
+		this.mainNavigation = false;
+	
+		if (!this.target)
+		{
+			this.mainNavigation = true;
+			this.target = 'main';
+		}
+	
+		var args = 'module='+this.module+'&action='+this.action+'&target='+this.target;
+		
+		if (this.otherArgs)
+		{
+			args = args + '&'+this.otherArgs;
+		}
+	
+		var targetURL = 'index.php?'+args;
+		
+		if (this.isDownload)
+		{
+			var a = document.createElement('a');
+			
+			if (window.URL && window.Blob && ('download' in a) && window.atob)
+			{
+				this.anchor = a;
 			}
-		});	
-		waitForOperation(progressBar);
-	}
-	else
-	{
-		window.location = 'index.php?'+args;
-	}
+			else
+			{
+				window.location = targetURL;
+				return;
+			}
+		}
+		
+		targetURL = targetURL + '&json=true';		
 
+		if (this.progressBar)
+		{
+			var progressBar = $('#'+this.progressBar);
+			var percent = 0;
+			progressBar.css('width', '0');	
+		
+			var timerID = setInterval(function()
+			{
+				getProgress('current', function(val)
+					{
+						percent = val;	
+						
+						if (percent>=100)
+						{
+							percent = 100;
+							clearInterval(timerID);				
+
+							if (that.data)
+							{
+								that.complete();
+							}					
+							else
+							{
+								that.progressBar = undefined;
+							}
+						}				
+						
+						var p = percent+'%';
+						console.log(p);
+						progressBar.css('width', p);	
+					});
+
+			} , 1000);			
+		}
+		
+		var requestType;
+		
+		if (this.isDownload)
+		{
+			requestType = 'GET';
+		}
+		else
+		{
+			requestType = 'POST';
+		}
+			
+		$.ajax({
+			url: targetURL,
+			type: requestType,
+			error: function(xhr, textStatus, errorThrown){
+				if (that.failCallback)
+				{
+					that.failCallback();
+				}
+				alert('request failed '+targetURL);
+			},
+			success: function(data)								
+			{	
+				that.data = $.parseJSON(data);
+				
+				if (!that.progressBar)
+				{
+					that.complete();	
+				}				
+			}
+		});		
+		
+		return false;		
+	};
+	
+	return nav;
 }
+  
 
 window.onpopstate = function(e){	
     if(e.state){		
