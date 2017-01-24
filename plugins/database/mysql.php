@@ -5,7 +5,7 @@ class SQL
 	public $db;
 	
 	function __construct($config) {
-		$this->db = new mysqli($config->host, $config->user, $config->pass) or die($this->db->error);
+		$this->db = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass) or die($this->db->error);
 
 		if (!mysqli_set_charset($this->db, "utf8"))
 		{

@@ -6,21 +6,15 @@ class SettingsController extends Controller {
    {
 	   parent::__construct($context);
    }
-
-   public function page($context)
-   {
-		$_SESSION['tab'] = $_REQUEST['tab'];
-		$this->render($context);
-   }
    
-   public function render($context)
+   public function beforeRender($context)
    {
 	   $selectedTabName = $context->loadVar('tab', 'system');
 	   $tabs = array();
-	   $tabs[] = array('name' => 'system', 'label'  => 'Sistema', 'active' => false);
-	   $tabs[] = array('name' => 'database', 'label'  => 'Base de Dados', 'active' => false);
-	   $tabs[] = array('name' => 'entities', 'label'  => 'Entidades', 'active' => false);
-	   $tabs[] = array('name' => 'plugins', 'label'  => 'Plugins', 'active' => false);
+	   $tabs[] = array('name' => 'system', 'label'  => 'Sistema', 'active' => false, 'fields' => '');
+	   $tabs[] = array('name' => 'database', 'label'  => 'Base de Dados', 'active' => false, 'fields' => 'sqlPlugin,sqlHost,sqlUser,sqlPass');
+	   $tabs[] = array('name' => 'entities', 'label'  => 'Entidades', 'active' => false, 'fields' => '');
+	   $tabs[] = array('name' => 'plugins', 'label'  => 'Plugins', 'active' => false, 'fields' => '');
 	   
 	   $total = count($tabs);
 	   for ($i=0; $i<$total; $i++)
@@ -42,8 +36,8 @@ class SettingsController extends Controller {
 	   
 	   $context->tabs = $tabs;
 	   $context->selectedTab = $selectedTab;
-	   parent::render($context);
-   }
+	   $context->pushTemplate('settings/'.$selectedTabName);
+	 }
 } 
 
 

@@ -275,7 +275,7 @@ class Context {
 	function reload()
 	{
 		$this->outputTarget = 'body_content';
-		$this->pushTemplate('views/body');
+		$this->pushTemplate('body');
 	}
 	
 	public function pushTemplate($fileName)

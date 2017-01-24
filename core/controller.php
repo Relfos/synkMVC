@@ -21,18 +21,23 @@ class Controller {
 	   echo $progress;
    }
 
+   protected function beforeRender($context)
+   {
+	   
+   }
+   
    public function render($context)
    {
 		$viewFile = $context->curView;
-		$viewPath = 'views/'. $context->module->name.'/'.$viewFile;
+		$viewPath = $context->module->name.'/'.$viewFile;
 	   
-		if (!file_exists($viewPath.'.html'))
+		if (!file_exists('views/'. $viewPath.'.html'))
 		{
-			$viewPath = 'views/common/'. $viewFile;
+			$viewPath = 'common/'. $viewFile;
 		}
 		
 		
-		if (!file_exists($viewPath.'.html'))
+		if (!file_exists('views/'. $viewPath.'.html'))
 		{
 			$layoutTemplate = "Could not load view '".$context->curView."' for ".$context->module->name;			
 		}
@@ -43,14 +48,25 @@ class Controller {
 		}
 		      		
 		$layoutTemplate = '';
-		
+	
+		$this->beforeRender($context);
 		//var_dump($context->templateStack); die();
 	  
 		$total = count($context->templateStack);
 		for ($i=$total-1; $i>=0; $i--)
 		{			
-			$fileName = $context->templateStack[$i].'.html';
-			$body = file_get_contents($fileName);
+			$fileName = 'views/'.$context->templateStack[$i].'.html';
+			
+			if (file_exists($fileName))
+			{
+				$body = file_get_contents($fileName);	
+			}
+			else
+			{
+				$layoutTemplate = "Error loading $fileName, the file was not found!";
+				break;
+			}
+			
 			
 			$layoutTemplate = str_replace('$body', $layoutTemplate, $body);	
 		}
