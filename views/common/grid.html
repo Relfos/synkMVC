@@ -95,68 +95,8 @@
 	</div>
 	{{/grid.exports.0}}
 
-	<div id="editModal" class="modal fade" role="dialog">
-	  <div class="modal-dialog">
-
-		<!-- Modal content-->
-		<div class="modal-content">
-		  <div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			<h4 class="modal-title">{{module.title}} - Edição</h4>
-		  </div>
-		  <div class="modal-body">
-			
-			<div id="edit_content"></div>
-			
-		  </div>
-		  <div class="modal-footer">
-			<button type="button" class="btn btn-theme" onclick="saveEntity(currentEntityID, '{{module.entity}}');">Guardar</button>
-			<button type="button" class="btn btn-theme" onclick="$('#editModal').modal('hide');	">Cancelar</button>
-			<button type="button" class="btn btn-theme" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">Apagar</button>
-		  </div>
-		</div>
-
-	  </div>
-	</div>
 
 	<script>
-	var currentEntityID;
-	function editEntity(id)
-	{
-		currentEntityID = id;
-		$('#edit_content').html('...');
-		synkNav().setAction('edit').setArgs('id='+id).setTarget('edit_content').go();
-		$('#editModal').modal('show');	
-	}
-
-	function saveEntity(id, className)
-	{
-		var form = $('#data_form');
-		form.validator();
-		form.on('submit', function (e) {
-			if (e.isDefaultPrevented()) 
-			{
-				return;
-			} 		
-			
-			e.preventDefault();
-			
-			var fields = '';
-			{{#grid.headers}}
-				fields = fields + '{{name}},';			
-			{{/grid.headers}}	  
-			
-			//alert(fields);
-					
-			$('#editModal').one('hidden.bs.modal', function(){
-					synkNav().setAction('save').setArgs('id='+id+'&class='+className+'&'+gather(fields)).go();
-				}).modal('hide');			
-			
-		});
-		
-		form.submit();
-	}
-
 	function deleteEntity(id, className)
 	{
 		bootbox.confirm("Não será possivél voltar atrás.<br>Tem a certeza que quer apagar esta entidade?", function(val)
@@ -236,3 +176,68 @@
 		<button type="button" class="btn btn-theme" onclick="editEntity(0)">Criar</button>
 	</div>
 {{/grid.rows.0}}
+
+	<div id="editModal" class="modal fade" role="dialog">
+	  <div class="modal-dialog">
+
+		<!-- Modal content-->
+		<div class="modal-content">
+		  <div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal">&times;</button>
+			<h4 class="modal-title">{{module.title}} - Edição</h4>
+		  </div>
+		  <div class="modal-body">
+			
+			<div id="edit_content"></div>
+			
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-theme" onclick="saveEntity(currentEntityID, '{{module.entity}}');">{{#grid.rows.0}}Guardar{{/grid.rows.0}}{{^grid.rows.0}}Criar{{/grid.rows.0}}</button>
+			{{#grid.rows.0}}
+			<button type="button" class="btn btn-theme" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">Apagar</button>
+			{{/grid.rows.0}}
+			<button type="button" class="btn btn-theme" onclick="$('#editModal').modal('hide');	">Cancelar</button>
+		  </div>
+		</div>
+
+	  </div>
+	</div>
+
+<script>
+	var currentEntityID;
+	function editEntity(id)
+	{
+		currentEntityID = id;
+		$('#edit_content').html('...');
+		synkNav().setAction('edit').setArgs('id='+id).setTarget('edit_content').go();
+		$('#editModal').modal('show');	
+	}
+
+	function saveEntity(id, className)
+	{
+		var form = $('#data_form');
+		form.validator();
+		form.on('submit', function (e) {
+			if (e.isDefaultPrevented()) 
+			{
+				return;
+			} 		
+			
+			e.preventDefault();
+			
+			var fields = '';
+			{{#grid.headers}}
+				fields = fields + '{{name}},';			
+			{{/grid.headers}}	  
+			
+			//alert(fields);
+					
+			$('#editModal').one('hidden.bs.modal', function(){
+					synkNav().setAction('save').setArgs('id='+id+'&class='+className+'&'+gather(fields)).go();
+				}).modal('hide');			
+			
+		});
+		
+		form.submit();
+	}
+</script>

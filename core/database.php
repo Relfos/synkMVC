@@ -9,7 +9,7 @@ abstract class DatabasePlugin
 	abstract public function createDatabase($name);
 	abstract public function createTable($dbName, $table, $fields, $key);
 	abstract public function getCount($dbName, $table, $condition = null);
-	abstract public function fetchObject($dbName, $table, $condition = null);
+	abstract public function fetchObject($dbName, $table, $condition);
 	abstract public function fetchAll($dbName, $table, $condition = null, $count = null, $offset = null);
 	abstract public function deleteAll($dbName, $table, $condition = null);
 	abstract public function insertObject($dbName, $table, $fields);
@@ -70,7 +70,8 @@ abstract class DatabasePlugin
 	
 	public function fetchEntityByID($context, $entityClass, $id) 
 	{
-		return $this->fetchEntity($context, $entityClass, "id=$id");
+		$condition = array('id' => array('eq' => $id));
+		return $this->fetchEntity($context, $entityClass, $condition);
 	}
 	
     public function fetchEntity($context, $entityClass, $condition)

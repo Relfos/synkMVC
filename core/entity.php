@@ -81,7 +81,8 @@ class Entity
 				$hash = $this->$fieldName;
 				if (strlen($hash)>0)
 				{
-					$row = $context->database->fetchObject($dbName, 'uploads', "`hash` = '$hash'");	
+					$cond = array("hash" => array('eq' => $hash));
+					$row = $context->database->fetchObject($dbName, 'uploads', $cond);	
 					$thumb = $row['thumb'];
 					//echo $hash; die();
 					$this->$fieldData = $thumb;					
@@ -121,8 +122,9 @@ class Entity
 		{		
 			$tableName = $this->tableName;
 			$dbName = $this->dbName;
-		
-			$context->database->deleteAll($dbName, $tableName, 'id='.$this->id);
+			
+			$cond = array('id' => array('eq' => $this->id));
+			$context->database->deleteAll($dbName, $tableName, $cond);
 			
 			$this->exists = false;
 			$this->id = 0;			

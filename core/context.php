@@ -248,7 +248,8 @@ class Context {
 	function fetchEnum($name)
 	{
 		$dbName = $this->dbName;
-		$row = $this->database->fetchObject($dbName, 'enums',  "`name` = '$name'");			
+		$cond = array("name" => array('eq' => $name));
+		$row = $this->database->fetchObject($dbName, 'enums',  $cond);			
 		$temp  = $row['values'];
 		$names = explode("|", $temp);			
 		
@@ -374,9 +375,9 @@ class Context {
 		}
 		else
 		{
-			$this->filter .= ' AND '. $filter;	
+			$this->filter = array("or" => array($this->filter, $filter));
 		}
-		
+				
 		$_SESSION['filter'] = $this->filter;
 	}
 

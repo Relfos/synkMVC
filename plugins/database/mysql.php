@@ -62,9 +62,10 @@ class mysqlPlugin extends DatabasePlugin
 		$this->selectDatabase($dbName);
 		$query = "SELECT count(*) as total FROM `$table`";
 		
-		if ($condition != null && strlen(condition)>0)
+		if ($condition != null)
 		{
-			$query .= " WHERE ".$condition;
+			$condition = $this->compileCondition($condition);
+			$query .= " WHERE $condition";
 		}
 		
 		$row = $this->fetchSingleRow($query);
@@ -76,9 +77,10 @@ class mysqlPlugin extends DatabasePlugin
 		return intval($row['total']);		 
 	 }
 	 
-	 public function fetchObject($dbName, $table, $condition = null)
+	 public function fetchObject($dbName, $table, $condition)
 	 {
 		$this->selectDatabase($dbName);
+		$condition = $this->compileCondition($condition);
 		$query = "SELECT * FROM `$table` WHERE $condition";
 		return $this->fetchSingleRow($query);
 	 }
@@ -90,6 +92,7 @@ class mysqlPlugin extends DatabasePlugin
 		
 		if (!is_null($condition))
 		{
+			$condition = $this->compileCondition($condition);
 			$query .= " WHERE $condition";
 		}			
 		
@@ -119,9 +122,10 @@ class mysqlPlugin extends DatabasePlugin
 	 {
 		$this->selectDatabase($dbName);
 		$query = "DELETE FROM ".$table;
-		if ($condition != null && strlen($condition)>0)
+		if (!is_null($condition))
 		{
-			$query .= " WHERE ".$condition;
+			$condition = $this->compileCondition($condition);
+			$query .= " WHERE $condition";
 		}
 		
 		$this->query($query);		 
@@ -149,6 +153,7 @@ class mysqlPlugin extends DatabasePlugin
 		}
 
 		$this->selectDatabase($dbName);
+		$condition = $this->compileCondition($condition);
 		$query = "UPDATE $table SET $query WHERE $condition";	
 		$this->query($query);
 	}
@@ -232,6 +237,77 @@ class mysqlPlugin extends DatabasePlugin
 		return "'$value'";
 	}
 	
+	private function compileExpression($expr)
+	{
+		foreach ($expr as $key => $value)
+		{
+			if ($key == 'like')
+			{
+				$value = "%$value%";
+			}
+			
+			$value = $this->encodeField($value);
+						
+			switch ($key)
+			{
+				case 'like': $op ="like"; break;
+				case 'eq': $op = '='; break;
+				case 'lt': $op = '<'; break;
+				case 'gt': $op = '>'; break;
+				case 'lte': $op = '<='; break;
+				case 'gte': $op = '>='; break;
+				case 'ne': $op = '<>'; break;
+				default: echo "invalid operator [$key]"; die();
+			}			
+			
+			return "$op $value";
+		}
+		
+		return null;
+	}
+
+	private function compileCondition($condition, $separator = null)
+	{
+		if (!is_array($condition))
+		{			
+			echo "invalid condition $condition, must be an array!"; 
+			echo $this->context->getCallstack();
+			die ();
+		}		
+		
+		$i = 0;
+		$result = '';
+		foreach ($condition as $key => $value)
+		{
+			if (is_null($separator)) // terminal node			
+			{
+				if ($key == 'or')
+				{
+					return $this->compileCondition($value, 'OR');
+				}
+
+				if ($key == 'and')
+				{
+					return $this->compileCondition($value, 'AND');
+				}
+		
+				$expr = $this->compileExpression($value);
+				return "`$key` $expr";
+			}
+			
+			if ($i>0)
+			{
+				$result .= " $separator ";
+			}
+
+			$subCond = $this->compileCondition($value);
+			$result .= " $subCond";
+			$i++;
+		}
+		
+		return "($result)";
+	}
+
 }
 
 

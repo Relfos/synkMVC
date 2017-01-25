@@ -22,7 +22,8 @@ class AuthController extends Controller {
 	   $password = $context->loadVarFromRequest('password', '');
 	   
 	   $dbName = $context->config->database;
-	   $row = $context->database->fetchObject($dbName, 'users',  "name='$email'");
+	   $cond = array("name" => array('eq' => $email));
+	   $row = $context->database->fetchObject($dbName, 'users',  $cond);
 	   
 	   if ($this->checkPassword($password, $row['hash']))
 	   {

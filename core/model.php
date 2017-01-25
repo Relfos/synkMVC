@@ -27,21 +27,19 @@ class ModelController extends Controller {
 			die("Invalid field for filtering");
 		}
 		else
-		{
-			$fieldValue = $field->encodeValue($context, $fieldValue);
-			
-			
+		{						
 			if (strpos($fieldValue, '*') !== false) 
 			{
-				$fieldValue = str_replace('*', '%', $fieldValue);
-				$filter = "$fieldName like $fieldValue";
+				$op = 'like';
 			}			
 			else
 			{
-				$filter = "$fieldName = $fieldValue";
+				$op = 'eq';
 			}
 			
-			$context->addFilter($filter);
+			$condition = array($fieldName => array($op => $fieldValue));
+
+			$context->addFilter($condition);
 			$this->render($context);
 		}
 	}
@@ -130,7 +128,7 @@ class ModelController extends Controller {
 		if (isset($_REQUEST['term']))
 		{
 			$term = $_REQUEST['term'];
-			$condition = "name like '%".$term."%'";
+			$condition = array("name" => array('like' => $term));
 		}	
 		else
 		{
