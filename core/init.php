@@ -8,12 +8,25 @@ error_reporting(E_ALL);
 
 session_start();
 
+require_once('core/utils.php');
+
+if (!file_exists("config.php"))
+{
+	$config = new stdClass();
+	$config->logFile = null;
+	$config->database = 'synk';
+	$config->instanced = false;
+	$config->sqlPlugin = 'mysql';
+	$config->sqlHost = 'localhost';
+	$config->sqlUser = 'root';
+	$config->sqlPass = '';
+	saveConfiguration($config);	
+}
 
 require_once('config.php');
 
 $config = new Config();
 
-require_once('core/utils.php');
 require_once('core/context.php');
 require_once('core/database.php');
 require_once('core/entity.php');

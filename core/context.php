@@ -49,6 +49,8 @@ class Context {
 		{
 			$this->dbName = $this->config->database;
 		}		
+		
+		$this->database->prepare();
 	}
 	
 	public function initDatabase()
@@ -234,11 +236,7 @@ class Context {
 			$i++;
 		}
 		
-		$dbFields = array(
-			array('name' => $name),
-			array('values' => $values),
-			array('keys' => $keys)
-		);
+		$dbFields = array('name' => $name, 'values' => $values,'keys' => $keys);
 
 		$dbName = $this->dbName;		
 		$this->database->insertObject($dbName, 'enums', $dbFields);
@@ -250,6 +248,13 @@ class Context {
 		$dbName = $this->dbName;
 		$cond = array("name" => array('eq' => $name));
 		$row = $this->database->fetchObject($dbName, 'enums',  $cond);			
+		//var_dump($row); die();
+		
+		if (is_null($row))
+		{
+			return array();
+		}
+		
 		$temp  = $row['values'];
 		$names = explode("|", $temp);			
 		
@@ -394,28 +399,7 @@ class Context {
 			file_put_contents($this->config->logFile, "$text\n", FILE_APPEND | LOCK_EX);				
 		}
 	}
-	
-	public function saveConfiguration()
-	{
-		$myfile = fopen("config.php", "w");
-		fwrite($myfile, "<?php\n");
-		fwrite($myfile, "class Config\n");
-		fwrite($myfile, "{\n");
-		foreach ($this->config as $key => $value) 
-		{
-			$isSimple = ($value == 'true' || $value == 'false' || is_numeric($value));
-			if (!$isSimple)
-			{
-				$value = "'$value'";
-			}
-			fwrite($myfile, "\tpublic \$$key = $value;\n");
-		}
-		fwrite($myfile, "}\n");
-		fwrite($myfile, "?>\n");
 		
-		fclose($myfile);		
-	}
-	
 	public function sendDownload($fileName, $data, $mimeType)
 	{
 		$this->isDownload = true;

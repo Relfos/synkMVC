@@ -104,13 +104,14 @@ class Entity
 		
 			$dbFields[$fieldName] = $fieldValue;
 		}
-
+			
 		if ($this->exists)
 		{
-			$context->database->saveObject($dbName, $tableName, $dbFields, 'id='.$this->id);
+			$context->database->saveObject($dbName, $tableName, $dbFields, 'id', $this->id);
 		}
 		else
 		{			
+			$dbFields['insertion_date'] = $this->insertion_date;
 			$context->database->insertObject($dbName, $tableName, $dbFields);
 			$this->exists = true;
 		}		

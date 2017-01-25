@@ -3,3 +3,4 @@ demos/
 tmp/
 log.txt
 demos_template/
+config.php

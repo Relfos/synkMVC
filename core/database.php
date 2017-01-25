@@ -13,51 +13,48 @@ abstract class DatabasePlugin
 	abstract public function fetchAll($dbName, $table, $condition = null, $count = null, $offset = null);
 	abstract public function deleteAll($dbName, $table, $condition = null);
 	abstract public function insertObject($dbName, $table, $fields);
-	abstract public function saveObject($dbName, $table, $fields, $condition);
+	abstract public function saveObject($dbName, $table, $fields, $key, $value);
 	
 	function __construct($context) {		
 		
-		$this->context = $context;
-		
+		$this->context = $context;		
+	}
+	
+	public function prepare()
+	{
 		if ($this->failed)
 		{
 			return;
-		}
+		}		
 		
+		$context = $this->context;
 		$dbName = $context->config->database;
-		$this->createDatabase($dbName);		
+		$this->createDatabase($dbName);				
 		
 		if ($this->failed)
 		{
 			return;
-		}
-
-		$this->createTable($dbName, 'users', array(
-			'id' => 'integer unsigned',
-			'name' => 'varchar(30)',
-			'hash' => 'varchar(40)',
-			'database' => 'varchar(80)'
-		));
+		}		
 
 		$total = $this->getCount($dbName, 'users');
 		if ($total == '0')
 		{
 			$user = $this->createEntity($context, 'user');			
+
 			$user->name = 'admin@synkdata.com';
 			$user->hash = $this->getPasswordHash('test');
 						
-			if ($config->instanced)
+			if ($context->config->instanced)
 			{
 				$user->database = 'crm'. uniqid();	
 			}
 			else
 			{
-				$user->database = $config->database;
+				$user->database = $context->config->database;
 			}
 			
 			$user->save($context);
-			//$sql->query("INSERT INTO $dbName.users (`name`, `hash`, `database`) VALUES ('$user_name', '$user_hash', '$user_db');");			
-		}			
+		}					
 	}
 	
 	public function createEntity($context, $entityClass)
@@ -70,6 +67,13 @@ abstract class DatabasePlugin
 	
 	public function fetchEntityByID($context, $entityClass, $id) 
 	{
+		$id = intval($id);
+		if ($id == 0)
+		{
+			$entity = $this->createEntity($context, $entityClass);
+			return $entity;
+		}
+		
 		$condition = array('id' => array('eq' => $id));
 		return $this->fetchEntity($context, $entityClass, $condition);
 	}
@@ -124,11 +128,11 @@ abstract class DatabasePlugin
 		}
 		
 		$rows = $this->fetchAll($dbName, $tableName, $condition, $items_per_page, $offset);
-		$total = count($rows);
-		for ($i=0; $i<$total; $i++)
+		//var_dump($rows);die();
+		foreach ($rows as $row)
 		{			
-			$entity = $this->createEntity($context, $entityClass);
-			$entity->loadFromRow($rows[$i]);
+			$entity = $this->createEntity($context, $entityClass);			
+			$entity->loadFromRow($row);
 			$entity->expand($context);
 			$entities[] = $entity;
 		}

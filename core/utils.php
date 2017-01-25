@@ -1,5 +1,13 @@
 <?php
 
+function objectToArray($o) 
+{
+	$a = array(); 
+	foreach ($o as $k => $v) 
+		$a[$k] = (is_array($v) || is_object($v)) ? objectToArray($v): $v;
+	return $a; 
+}
+
 function appendArgument($url, $name, $value) {
     if (strpos($url, '?') !== false) {
         $url .= '&';
@@ -37,6 +45,27 @@ function fixNameCase($name)
 		}
 	}
 	return substr_replace($fixed,'', -1);		
+}
+
+function saveConfiguration($config)
+{
+	$myfile = fopen("config.php", "w");
+	fwrite($myfile, "<?php\n");
+	fwrite($myfile, "class Config\n");
+	fwrite($myfile, "{\n");
+	foreach ($config as $key => $value) 
+	{
+		$isSimple = ($value == 'true' || $value == 'false' || is_numeric($value));
+		if (!$isSimple)
+		{
+			$value = "'$value'";
+		}
+		fwrite($myfile, "\tpublic \$$key = $value;\n");
+	}
+	fwrite($myfile, "}\n");
+	fwrite($myfile, "?>\n");
+	
+	fclose($myfile);		
 }
 
 class ProgressBar

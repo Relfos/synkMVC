@@ -18,7 +18,7 @@ class SettingsController extends Controller {
 				$context->config->$key = $value;
 			}
 		}
-		$context->saveConfiguration();
+		saveConfiguration($context->config);
 	   
 		if ($context->database->failed)
 		{

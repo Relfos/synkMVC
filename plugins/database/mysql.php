@@ -8,16 +8,16 @@ class mysqlPlugin extends DatabasePlugin
 	{
 		$config = $context->config;
 		
-		$this->db = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass);
-		if ($this->db->connect_error)  
+		$this->client = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass);
+		if ($this->client->connect_error)  
 		{
 			$this->failed = true;
 			return;
 		}		
 				
-		if (!mysqli_set_charset($this->db, "utf8"))
+		if (!mysqli_set_charset($this->client, "utf8"))
 		{
-			die($this->db->error);
+			die($this->client->error);
 		}					
 		
 		mb_internal_encoding('UTF-8');
@@ -136,7 +136,7 @@ class mysqlPlugin extends DatabasePlugin
 		$this->query("USE $name;");
 	}
 	
-	public function saveObject($dbName, $table, $fields, $condition)
+	public function saveObject($dbName, $table, $fields, $key, $value)
 	{
 		$query = '';
 		$i = 0;
@@ -154,7 +154,8 @@ class mysqlPlugin extends DatabasePlugin
 
 		$this->selectDatabase($dbName);
 		$condition = $this->compileCondition($condition);
-		$query = "UPDATE $table SET $query WHERE $condition";	
+		$value = $this->encodeField($value);
+		$query = "UPDATE $table SET $query WHERE $key = $value";	
 		$this->query($query);
 	}
 	
@@ -194,11 +195,11 @@ class mysqlPlugin extends DatabasePlugin
 		$this->context->log($this->context->getCallstack());
 		
 		//echo $query."<br>";		die();
-		$result = mysqli_query($this->db,$query);
+		$result = mysqli_query($this->client,$query);
 		if(!$result) 
 		{
 			$this->failed = true;
-			echo $this->db->error."<br>".$query; die();	
+			echo $this->client->error."<br>".$query; die();	
 			return null;						
 		}
 		return $result;
@@ -232,7 +233,7 @@ class mysqlPlugin extends DatabasePlugin
 			return $value;
 		}
 		
-		$value = mysqli_real_escape_string($this->db, $value);
+		$value = mysqli_real_escape_string($this->client, $value);
 		
 		return "'$value'";
 	}

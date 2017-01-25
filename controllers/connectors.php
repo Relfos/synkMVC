@@ -156,7 +156,7 @@ class ConnectorsController extends Controller {
     }
 
     public function api_call($context, $endpoint, $fields) {
-        $api_server = "http://93.108.142.102:8080";
+		$api_server = $context->config->synkServer;        
         //$api_server = "crm.synkdata.com:8080";
         $url = $api_server . "/api/2016/" . $endpoint;
 
