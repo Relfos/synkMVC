@@ -6,7 +6,6 @@ Written in modern extra pure object-oriented PHP.
 
 * Author: [Sérgio Flores](https://github.com/relfos)
 * License: [APACHE](http://opensource.org/licenses/Apache-2.0)
-----------------
 
 Single-page paradigm
 ----------------
