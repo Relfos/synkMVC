@@ -1,8 +1,8 @@
 SynkMVC
 ============
 
-MVC Framework for PHP / HTML5.
-Written in modern extra pure object-oriented PHP.
+MVC Framework for PHP / HTML5.  
+Written in modern extra pure object-oriented PHP, built for speed.
 
 * Author: [Sérgio Flores](https://github.com/relfos)
 * License: [APACHE](http://opensource.org/licenses/Apache-2.0)
