@@ -54,13 +54,16 @@ function saveConfiguration($config)
 	fwrite($myfile, "class Config\n");
 	fwrite($myfile, "{\n");
 	foreach ($config as $key => $value) 
-	{
-		$isSimple = ($value == 'true' || $value == 'false' || is_numeric($value));
-		if (!$isSimple)
+	{		
+		$isSimple = (is_null($value) || is_bool($value) || is_numeric($value));		
+		if ($isSimple)
 		{
-			$value = "'$value'";
+			$outValue = var_export($value, true);
 		}
-		fwrite($myfile, "\tpublic \$$key = $value;\n");
+		else{
+			$outValue = "'$value'";
+		}
+		fwrite($myfile, "\tpublic \$$key = $outValue;\n");
 	}
 	fwrite($myfile, "}\n");
 	fwrite($myfile, "?>\n");

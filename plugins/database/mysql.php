@@ -172,14 +172,14 @@ class mysqlPlugin extends DatabasePlugin
 				$valueList .= ', ';
 			}
 			
-			$fieldList .= $fieldName;
+			$fieldList .= "`$fieldName`";
 			$valueList .= $this->encodeField($fieldValue);
 			
 			$i++;
 		}
 		
 		$this->selectDatabase($dbName);
-		$query = "INSERT INTO $table ($fieldList) VALUES($valueList)";	
+		$query = "INSERT INTO `$table` ($fieldList) VALUES($valueList)";	
 		$this->query($query);
 	}
 	
