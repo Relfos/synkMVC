@@ -103,9 +103,10 @@ class ConnectorsController extends Controller {
 				continue;
 			}
 				
+			$fieldName = $field->name;
 			$entityID = $external_data->$prop_key;
-			$condition = $propmap[$prop_key].' = '. $field->encodeValue($context, $entityID);
-			
+			$condition = array($propmap[$prop_key] => array('eq' => $entityID));
+								
 			$entity = $context->database->fetchEntity($context, $entityClass, $condition);
 						
 			if (!$entity->exists)
