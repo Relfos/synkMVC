@@ -3,6 +3,7 @@
 class mysqlPlugin extends DatabasePlugin
 {
 	private $db;
+	private $currentDB;
 	
 	function __construct($context) 
 	{
@@ -133,6 +134,11 @@ class mysqlPlugin extends DatabasePlugin
 		
 	public function selectDatabase($name)
 	{
+		if ($this->currentDB == $name)
+		{
+			return;
+		}
+		$this->currentDB = $name;
 		$this->query("USE $name;");
 	}
 	
