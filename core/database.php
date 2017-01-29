@@ -36,11 +36,11 @@ abstract class DatabasePlugin
 			return;
 		}		
 
+		$user = $this->createEntity($context, 'user');			
+		
 		$total = $this->getCount($dbName, 'users');
 		if ($total == '0')
 		{
-			$user = $this->createEntity($context, 'user');			
-
 			$user->name = 'admin@synkdata.com';
 			$user->hash = $this->getPasswordHash('test');
 						

@@ -23,11 +23,12 @@ class Context {
 			$this->dbName = $dbName;
 
 			$fields = array(
-				array('name' => 'name', 'type' => 'varchar(30)'),
-				array('name' => 'values', 'type' => 'text'),
-				array('name' => 'keys', 'type' => 'text'),
+				'name' => 'varchar(30)',
+				'values' => 'text',
+				'keys' => 'text',
 			);
-			$this->database->createDatabase($dbName, 'enums', $fields, 'name');
+			
+			$this->database->createTable($dbName, 'enums', $fields, 'name');
 											
 			/*$this->sql->query("CREATE TABLE IF NOT EXISTS $databaseName.enums (
 			`name` VARCHAR(30) NOT NULL,
@@ -380,7 +381,7 @@ class Context {
 		}
 		else
 		{
-			$this->filter = array("or" => array($this->filter, $filter));
+			$this->filter = array('and' => array($this->filter, $filter));
 		}
 				
 		$_SESSION['filter'] = $this->filter;
