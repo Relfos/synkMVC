@@ -118,8 +118,14 @@ function synkNav()
 			var a = this.anchor;
 			a.href = url;
 			a.download = data.filename;
+			document.body.appendChild(a);
 			a.click();
-			window.URL.revokeObjectURL(url);			
+			
+			setTimeout(function(){
+				document.body.removeChild(a);
+				window.URL.revokeObjectURL(url);			
+				}, 100);  
+	
 			return;			
 		}
 		else
