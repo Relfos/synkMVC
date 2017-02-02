@@ -16,7 +16,7 @@ if (!file_exists("config.php"))
 	$config->logFile = null;
 	$config->database = 'synk';
 	$config->instanced = false;
-	$config->sqlPlugin = 'mysql';
+	$config->dbPlugin = 'mysql';
 	$config->sqlHost = 'localhost';
 	$config->sqlUser = 'root';
 	$config->sqlPass = '';

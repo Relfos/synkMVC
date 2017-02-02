@@ -1,7 +1,9 @@
   <div class="form-group">
 	<label for="plugin">Plugin</label>
 	<select class="form-control" id="sqlPlugin">
-		<option value='{{config.sqlPlugin}}' {{#selected}}selected="selected"{{/selected}}>{{config.sqlPlugin}}</option>
+	{{#dbPlugins}}
+		<option value='{{name}}' {{#selected}}selected="selected"{{/selected}}>{{name}}</option>
+	{{/dbPlugins}}
 	</select>		
   </div>
 

@@ -56,17 +56,17 @@ class Context {
 	
 	public function initDatabase()
 	{
-		$sqlPlugin = $this->config->sqlPlugin;
+		$dbPlugin = $this->config->dbPlugin;
 		
-		$pluginPath = 'plugins/database/'.$sqlPlugin.'.php';
+		$pluginPath = 'plugins/database/'.$dbPlugin.'.php';
 		if (!file_exists($pluginPath))
 		{
-			echo 'Missing database plugin: '.$sqlPlugin;
+			echo 'Missing database plugin: '.$dbPlugin;
 			die();
 		}
 		require_once($pluginPath);
 		
-		$dbClassName = $this->config->sqlPlugin.'Plugin';
+		$dbClassName = $this->config->dbPlugin.'Plugin';
 		$this->database = new $dbClassName($this);
 	}
 	
@@ -445,6 +445,18 @@ class Context {
         ob_end_clean(); 		
 		return $trace;
 	}
+	
+   public function getPluginList($pluginType, $selectedOption = null)
+   {
+		$pluginList = array();
+		foreach (glob("plugins/$pluginType/*.php") as $file) 
+		{
+			$extensionName = pathinfo($file, PATHINFO_FILENAME);
+			$pluginList[] = array('name' => $extensionName, 'type' => $pluginType, 'selected' => $selectedOption == $extensionName);						
+		}	
+		return $pluginList;
+   }
+   
 }
 
 

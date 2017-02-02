@@ -37,9 +37,13 @@ class SettingsController extends Controller {
 	   $this->render($context);
    }
    
+   
+   
    public function beforeRender($context)
    {
 		$dbTab = array('name' => 'database', 'label'  => 'Base de Dados', 'active' => false, 'fields' => 'sqlPlugin,sqlHost,sqlUser,sqlPass,instanced');
+
+		$context->dbPlugins = $context->getPluginList('database', $context->config->dbPlugin);
 	   
 		if ($context->database->failed)
 		{
@@ -67,14 +71,8 @@ class SettingsController extends Controller {
 			   }
 			}
 			$context->modelList = $entities;
-
-			$pluginList = array();
-			foreach (glob('plugins/export/*.php') as $file) 
-			{
-				$extensionName = pathinfo($file, PATHINFO_FILENAME);
-				$pluginList[] = array('name' => $extensionName, 'type' => 'export');
-			}	
-			$context->pluginList = $pluginList;
+			
+			$context->pluginList = $context->getPluginList('export');
 			
 			$total = count($tabs);
 			for ($i=0; $i<$total; $i++)
