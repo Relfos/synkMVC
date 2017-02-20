@@ -7,19 +7,23 @@ class Context {
 	public $outputTarget;
 	public $templateStack = array();
 	
+	public $text = null;
+	
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);		
 		$this->modules = array ();
 		
 		$this->outputTarget = $this->loadVarFromRequest('target', 'main');
 		
+		$this->language = $this->loadVar('language', 'pt');
+		
 		$this->config = new Config();
 
 		$this->initDatabase();
-
+			
 		if ($this->hasLogin)
 		{
-			$dbName = $this->loadVar('user_db', '');	
+			$dbName = $this->loadVar('user_db', '');
 			$this->dbName = $dbName;
 
 			$fields = array(
@@ -103,6 +107,8 @@ class Context {
 			}
 			file_put_contents('.htaccess', $htaccessData);
 		}
+		
+		$this->module->title = $this->module->getTitle($this);
 	}
 	
 	public function execute($action = null)
@@ -132,7 +138,7 @@ class Context {
 			$json_array=array(
 			'target' => $this->outputTarget,
 			'module'=> $this->module->name,						
-			'title'=> $this->module->title,
+			'title'=> $this->module->getTitle($this),
 			'content'=>$html
 			);
 			echo json_encode($json_array);	
@@ -195,7 +201,7 @@ class Context {
 	{
 		$i = 0;
 		foreach($this->menus as $menu) {
-			if (strcmp($menu['title'], $name) == 0)
+			if ($menu['title'] == $name)
 			{
 				return $i;
 			}
@@ -226,7 +232,7 @@ class Context {
 			}
 			
 			$index = $this->findMenuIndex($module->menu);
-			$this->menus[$index]['items'][] = array('label' => $module->title, 'link' => $link);
+			$this->menus[$index]['items'][] = array('label' => $module->getTitle($this), 'link' => $link);
 		}				
 	}
 	
@@ -467,7 +473,7 @@ class Context {
         ob_end_clean(); 		
 		return $trace;
 	}
-	
+		
    public function getPluginList($pluginType, $selectedOption = null)
    {
 		$pluginList = array();
@@ -478,7 +484,32 @@ class Context {
 		}	
 		return $pluginList;
    }
-   
+  
+	public function getTranslations()
+	{
+	   if (is_null($this->text))
+	   {
+		   require_once('language/translation_'.$this->language.'.php');
+		   $this->text = loadTranslation();
+	   }
+	   
+	   return $this->text;
+	}
+	
+	public function translate($key)
+	{
+	   if (is_null($this->text))
+	   {
+		   $this->getTranslations();
+	   }
+	   
+	   if (array_key_exists($key, $this->text))
+	   {
+			return $this->text[$key];   
+	   }   
+	   
+	   return "(?$key?)";
+   }
 }
 
 

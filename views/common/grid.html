@@ -38,7 +38,7 @@
 					{{/visible}}
 				{{/columns }}	
 
-				<td><a href="#" onclick="editEntity('{{rowID}}');" class="btn btn-theme small_btn">Editar</a></td>
+				<td><a href="#" onclick="editEntity('{{rowID}}');" class="btn btn-theme small_btn">{{text.grid_action_edit}}</a></td>
 			  </tr>
 			{{/grid.rows}}
 		 
@@ -48,15 +48,15 @@
 
 	<div class="col-md-12 text-center">		
 		<form role="form" id="controls_form">
-		<button type="button" class="btn btn-theme" onclick="editEntity(0)">Criar</button>
+		<button type="button" class="btn btn-theme" onclick="editEntity(0)">{{text.grid_action_create}}</button>
 
 		{{#grid.exports.0}}
-		<button type="button" class="btn btn-theme dropdown-toggle" data-toggle="modal" data-target="#exportModal">Exportar</button>
+		<button type="button" class="btn btn-theme dropdown-toggle" data-toggle="modal" data-target="#exportModal">{{text.grid_action_export}}</button>
 		{{/grid.exports.0}}
 		
-		<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">Filtrar</button>
+		<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">{{text.grid_action_filter}}</button>
 		{{#filter}}
-		<button type="button" class="btn btn-theme" onclick="synkNav().setAction('unfilter').go();">Limpar</button>
+		<button type="button" class="btn btn-theme" onclick="synkNav().setAction('unfilter').go();">{{text.grid_action_unfilter}}</button>
 		{{/filter}}
 		</form>
 	</div>
@@ -87,7 +87,7 @@
 			
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-theme" data-dismiss="modal">Fechar</button>
+			<button type="button" class="btn btn-theme" data-dismiss="modal">{{text.grid_action_close}}</button>
 		  </div>
 		</div>
 
@@ -99,7 +99,7 @@
 	<script>
 	function deleteEntity(id, className)
 	{
-		bootbox.confirm("Não será possivél voltar atrás.<br>Tem a certeza que quer apagar esta entidade?", function(val)
+		bootbox.confirm("{{text.grid_prompt_warning}}<br>{{text.grid_prompt_delete}}", function(val)
 		{
 			if (val == true)
 			{
@@ -126,7 +126,7 @@
 		<div class="modal-content">
 		  <div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			<h4 class="modal-title">{{module.title}} - Pesquisa</h4>
+			<h4 class="modal-title">{{module.title}} - {{text.grid_title_search}}</h4>
 		  </div>
 		  <div class="modal-body">
 			
@@ -134,7 +134,7 @@
 			<form role="form" id="search_form">
 				<div class="col-xs-6">
 					<div class="form-group form_row">
-						<label for="field_name" class="control-label">Campo</label>
+						<label for="field_name" class="control-label">{{text.grid_label_field}}</label>
 						
 						<select class="form-control" id="field_name">
 					{{#grid.headers}}
@@ -148,7 +148,7 @@
 				
 				<div class="col-xs-6">
 					<div class="form-group form_row">
-						<label for="field_value" class="control-label">Valor</label>
+						<label for="field_value" class="control-label">{{text.grid_label_value}}</label>
 						
 						<input type="text" class="form-control" id="field_value" placeholder="Insira um valor">
 							
@@ -160,8 +160,8 @@
 			
 		  </div>
 		  <div class="modal-footer">
-		  <button type="button" class="btn btn-theme" onclick="searchEntity()">Pesquisar</button>
-			<button type="button" class="btn btn-theme" data-dismiss="modal">Fechar</button>
+		  <button type="button" class="btn btn-theme" onclick="searchEntity()">{{text.grid_action_search}}</button>
+			<button type="button" class="btn btn-theme" data-dismiss="modal">{{text.grid_action_close}}</button>
 		  </div>
 		</div>
 
@@ -170,10 +170,10 @@
 {{/grid.rows.0}}
 
 {{^grid.rows.0}}
-<p>Não existem dados disponiveis no módulo {{module.title}}.</p>
+<p>{{grid.error}}</p>
 	<div class="col-md-12 text-center">		
 		<form role="form" id="controls_form">
-		<button type="button" class="btn btn-theme" onclick="editEntity(0)">Criar</button>
+		<button type="button" class="btn btn-theme" onclick="editEntity(0)">{{text.grid_action_create}}</button>
 	</div>
 {{/grid.rows.0}}
 
@@ -184,7 +184,7 @@
 		<div class="modal-content">
 		  <div class="modal-header">
 			<button type="button" class="close" data-dismiss="modal">&times;</button>
-			<h4 class="modal-title">{{module.title}} - Edição</h4>
+			<h4 class="modal-title">{{module.title}} - {{text.grid_title_edit}}</h4>
 		  </div>
 		  <div class="modal-body">
 			
@@ -192,11 +192,11 @@
 			
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-theme" onclick="saveEntity(currentEntityID, '{{module.entity}}');">{{#grid.rows.0}}Guardar{{/grid.rows.0}}{{^grid.rows.0}}Criar{{/grid.rows.0}}</button>
+			<button type="button" class="btn btn-theme" onclick="saveEntity(currentEntityID, '{{module.entity}}');">{{#grid.rows.0}}{{text.grid_action_save}}{{/grid.rows.0}}{{^grid.rows.0}}{{text.grid_action_create}}{{/grid.rows.0}}</button>
 			{{#grid.rows.0}}
-			<button type="button" class="btn btn-theme" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">Apagar</button>
+			<button type="button" class="btn btn-theme" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">{{text.grid_action_delete}}</button>
 			{{/grid.rows.0}}
-			<button type="button" class="btn btn-theme" onclick="$('#editModal').modal('hide');	">Cancelar</button>
+			<button type="button" class="btn btn-theme" onclick="$('#editModal').modal('hide');	">{{text.grid_action_cancel}}</button>
 		  </div>
 		</div>
 

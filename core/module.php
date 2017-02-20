@@ -18,13 +18,7 @@ class Module
 		$this->needAuth = true;		
 		return $this;
     }
-	
-	public function setTitle($title)
-	{
-		$this->title = $title;	
-		return $this;
-	}
-	
+		
     public function setDefaultAction($action) {		
 		$this->defaultAction = $action;		
 		return $this;
@@ -46,6 +40,12 @@ class Module
 	{
 		return "synkNav().setModule('".$this->name."').go();";
 	}
+	
+	public function getTitle($context)
+	{
+		return $context->translate('module_'.$this->name);
+	}
+		
 }
 
 

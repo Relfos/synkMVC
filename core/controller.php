@@ -259,11 +259,20 @@ class Controller {
 			$exports[] = array('format' => $extensionName, 'label' => $extensionName);
 		}	
 		
+		$errorMessage = null;
+		
+		if (count($rows) == 0)
+		{
+			$errorMessage = $context->translate('grid_error_empty');
+			$errorMessage= str_replace('$name', $context->module->getTitle($context), $errorMessage);			
+		}
+		
 		$grid = array (
 		  'headers' => $headers,		  
 		  'rows' => $rows,
 		  'pages' => $pages,
-		  'exports' => $exports
+		  'exports' => $exports,
+		  'error' => $errorMessage
 		  );	   
 		  		
 		$context->grid = $grid;

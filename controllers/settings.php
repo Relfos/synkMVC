@@ -67,7 +67,7 @@ class SettingsController extends Controller {
 			{
 			   if ($module->entity)
 			   {
-				   $entities[] = array('title' => $module->title, 'name' => $module->entity, 'module' => $module->name);
+				   $entities[] = array('title' => $module->getTitle($context), 'name' => $module->entity, 'module' => $module->name);
 			   }
 			}
 			$context->modelList = $entities;

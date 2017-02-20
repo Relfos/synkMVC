@@ -36,7 +36,7 @@
 				{{/items}}
 			{{/menus}}
 										
-			<li><a href="#" onclick="synkNav().setModule('auth').setAction('logout').go();">Sair</a></li>
+			<li><a href="#" onclick="synkNav().setModule('auth').setAction('logout').go();">{{text.site_logout}}</a></li>
 {{/hasLogin}}		
 
 			</ul>
@@ -47,7 +47,7 @@
     <div class="col-sm-4 col-md-4">
         <form class="navbar-form" >
         <div class="input-group">
-            <input type="text" class="form-control" placeholder="Procure por clientes, produtos, etc..." name="q" id="general_search">
+            <input type="text" class="form-control" placeholder="{{text.site_searchbox}}" name="q" id="general_search">
             <div class="input-group-btn">
                 <button class="btn btn-default" type="button"><i class="glyphicon glyphicon-search"></i></button>
             </div>
