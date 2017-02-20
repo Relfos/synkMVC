@@ -1,9 +1,10 @@
 RewriteEngine on
 RewriteRule auth index.php?module=auth
 RewriteRule dashboard index.php?module=dashboard
-RewriteRule categories index.php?module=categories
 RewriteRule clients index.php?module=clients
-RewriteRule products index.php?module=products
 RewriteRule users index.php?module=users
+RewriteRule categories index.php?module=categories
+RewriteRule products index.php?module=products
 RewriteRule documents index.php?module=documents
+RewriteRule connectors index.php?module=connectors
 RewriteRule settings index.php?module=settings

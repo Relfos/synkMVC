@@ -16,15 +16,6 @@ $context->createModule('documents')->setTitle('Documentos')->setMenu('Modulos')-
 $context->createModule('connectors')->setTitle('Conectores')->setMenu('Admin')->requireAuth();
 $context->createModule('settings')->setTitle('Configuração')->setMenu('Admin')->requireAuth();
 
-$action = $context->loadVarFromRequest('action', 'page');
-
-if (strcmp($action, 'page') === 0) {
-	$context->pushTemplate('header');
-	$context->pushTemplate('body');
-	$action = 'render';
-
-}
-
-$context->execute($action);
+$context->execute();
 
 ?>

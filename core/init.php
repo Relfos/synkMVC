@@ -20,6 +20,8 @@ if (!file_exists("config.php"))
 	$config->sqlHost = 'localhost';
 	$config->sqlUser = 'root';
 	$config->sqlPass = '';
+	$config->defaultUser = 'admin';
+	$config->defaultPass = 'test';
 	saveConfiguration($config);	
 }
 

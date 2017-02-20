@@ -12,7 +12,7 @@ class mysqlPlugin extends DatabasePlugin
 		$this->client = new mysqli($config->sqlHost, $config->sqlUser, $config->sqlPass);
 		if ($this->client->connect_error)  
 		{
-			$this->failed = true;
+			$this->fail("Unable to connect to db");
 			return;
 		}		
 				
@@ -204,8 +204,8 @@ class mysqlPlugin extends DatabasePlugin
 		$result = mysqli_query($this->client,$query);
 		if(!$result) 
 		{
-			$this->failed = true;
-			echo $this->client->error."<br>".$query; die();	
+			$this->fail($this->client->error."<br>".$query);
+			die();	
 			return null;						
 		}
 		return $result;

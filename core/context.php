@@ -56,17 +56,17 @@ class Context {
 	
 	public function initDatabase()
 	{
-		$dbPlugin = $this->config->dbPlugin;
+		$sqlPlugin = $this->config->sqlPlugin;
 		
-		$pluginPath = 'plugins/database/'.$dbPlugin.'.php';
+		$pluginPath = 'plugins/database/'.$sqlPlugin.'.php';
 		if (!file_exists($pluginPath))
 		{
-			echo 'Missing database plugin: '.$dbPlugin;
+			echo 'Missing database plugin: '.$sqlPlugin;
 			die();
 		}
 		require_once($pluginPath);
 		
-		$dbClassName = $this->config->dbPlugin.'Plugin';
+		$dbClassName = $this->config->sqlPlugin.'Plugin';
 		$this->database = new $dbClassName($this);
 	}
 	
@@ -93,10 +93,32 @@ class Context {
 		{
 			$this->filter = $this->loadVar('filter', null);	
 		}							
+		
+		if (!file_exists('.htaccess'))
+		{
+			$htaccessData = "RewriteEngine on\n";
+			foreach($this->modules as $module) {
+				$name = $module->name;
+				$htaccessData .= "RewriteRule $name index.php?module=$name\n";
+			}
+			file_put_contents('.htaccess', $htaccessData);
+		}
 	}
 	
-	public function execute($action)
+	public function execute($action = null)
 	{
+		if (is_null($action))
+		{
+			$action = $this->loadVarFromRequest('action', 'page');
+
+			if ($action == 'page') 
+			{
+				$this->pushTemplate('header');
+				$this->pushTemplate('body');
+				$action = 'render';
+			}
+		}
+		
 		$this->prepare();
 		$this->loadMenus();
 

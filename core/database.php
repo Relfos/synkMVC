@@ -41,8 +41,8 @@ abstract class DatabasePlugin
 		$total = $this->getCount($dbName, 'users');
 		if ($total == '0')
 		{
-			$user->name = 'admin@synkdata.com';
-			$user->hash = $this->getPasswordHash('test');
+			$user->name = $context->config->defaultUser;
+			$user->hash = $this->getPasswordHash($context->config->defaultPass);
 						
 			if ($context->config->instanced)
 			{
@@ -54,6 +54,11 @@ abstract class DatabasePlugin
 			}
 			
 			$user->save($context);
+			
+			if ($context->config->instanced)
+			{
+				$this->createDatabase($user->database);
+			}			
 		}					
 	}
 	
@@ -158,7 +163,7 @@ abstract class DatabasePlugin
 		$this->deleteAll($dbName, $tableName);	
 	}
 
-	function getPasswordHash($password)
+	public function getPasswordHash($password)
 	{
 		if(!defined('CRYPT_MD5') || !constant('CRYPT_MD5')) {
 			// does not support MD5 crypt - leave as is
@@ -173,6 +178,12 @@ abstract class DatabasePlugin
 		return @crypt(strtolower(md5($password)));
 	}
 	
+	public function fail($error)
+	{
+		echo($error);
+		$this->failed = true;
+		session_destroy();		
+	}
 }
 
 ?>
