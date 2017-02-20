@@ -44,10 +44,9 @@ class Context {
 			$total = $this->database->getCount($dbName, 'enums');			
 			if ($total == '0')
 			{
-				$this->createEnum('product_types', array('Produto', 'Serviço', 'Outro'));
-
-				require_once ('countries.php');
-				createCountriesEnum($this);
+				require_once ('enums.php');
+				$this->createEnum("country", getCountryList());
+				$this->createEnum('product_type', array('Produto', 'Serviço', 'Outro'));
 			}					
 		}	
 		else
@@ -105,7 +104,8 @@ class Context {
 				$name = $module->name;
 				$htaccessData .= "RewriteRule $name index.php?module=$name\n";
 			}
-			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*) core/api.php?module=$2&action=$3 [QSA,L]'."\n";
+			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*)\/(\d*) index.php?module=$2&action=api&call=$3&id=$4 [QSA,L]'."\n";
+			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*) index.php?module=$2&action=api&call=$3 [QSA,L]'."\n";		
 			file_put_contents('.htaccess', $htaccessData);
 		}
 		
@@ -248,37 +248,21 @@ class Context {
 	function createEnum($name, $valuesArray)
 	{
 		$values = '';
-		$keys = '';
-		$i = 0;
-		foreach($valuesArray as $val) {
-			
-			if (is_array($val))
-			{
-				$value = $val['value'];
-				$key = $val['key'];
-			}
-			else
-			{
-				$value = $val;
-				$key = $i;				
-			}
+		foreach($valuesArray as $val) {		
+			$value = $val;
 			
 			if (strlen($values)>0)
 			{
 				$values .= '|';
-				$keys .= '|';
 			}
 			
 			$values .= $value;
-			$keys .= $key;
-			$i++;
 		}
 		
-		$dbFields = array('name' => $name, 'values' => $values,'keys' => $keys);
+		$dbFields = array('name' => $name, 'values' => $values);
 
 		$dbName = $this->dbName;		
 		$this->database->insertObject($dbName, 'enums', $dbFields);
-		//$this->sql->query("INSERT INTO enums (`name`, `values`, `keys`) VALUES ('$name', '$values', '$keys')");			
 	}
 	
 	function fetchEnum($name)
@@ -294,19 +278,7 @@ class Context {
 		}
 		
 		$temp  = $row['values'];
-		$names = explode("|", $temp);			
-		
-		$temp  = $row['keys'];
-		$keys = explode("|", $temp);			
-
-		$values = array();
-		
-		$i = 0;
-		foreach($names as $name) {
-			$entry = array( 'key' => $keys[$i], 'value' => $name, 'index' => $i);			
-			$values[] = $entry;
-			$i++;
-		}		
+		$values = explode("|", $temp);		
 		return $values;
 	}
 	

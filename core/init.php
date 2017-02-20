@@ -14,7 +14,7 @@ if (!file_exists("config.php"))
 {
 	$config = new stdClass();
 	$config->logFile = null;
-	$config->database = 'synk';
+	$config->database = 'crm';
 	$config->instanced = false;
 	$config->dbPlugin = 'mysql';
 	$config->sqlHost = 'localhost';

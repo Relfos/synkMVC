@@ -169,23 +169,29 @@ class Controller {
 				
 				if (!is_null($field->enum))
 				{
-					$options = $context->fetchEnum($field->enum);
-					$opLen = count($options);
-					for ($n=0; $n<$opLen; $n++)
+					$enumValues = $context->fetchEnum($field->enum);
+					$opLen = count($enumValues);
+					
+					$options = array();
+					foreach ($enumValues as $enumVal)
 					{
-						$op = $options[$n];
-						if ($op['key'] == $fieldValue || $op['value'] == $fieldValue)
+						$enumSelected = ($enumVal == $fieldValue);
+						$translateKey = 'enum_'.$field->enum.'_'.$enumVal;
+						$enumTranslation = $context->translate($translateKey);
+						
+						$op = array(
+							'key' => $enumVal,
+							'value' => $enumTranslation,
+							'selected' => $enumSelected							
+						);
+																		
+						if ($enumSelected)
 						{
-							$options[$n]['selected'] = true;
+							$maskedValue = $enumTranslation;							
 						}
 						
-						if ($fieldValue == $op['key'])
-						{
-							$maskedValue = $op['value'];
-						}
-					}
-					
-					
+						$options[] = $op;
+					}									
 				}
 				else
 				{

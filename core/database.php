@@ -46,11 +46,11 @@ abstract class DatabasePlugin
 						
 			if ($context->config->instanced)
 			{
-				$user->database = 'crm'. uniqid();	
+				$user->database = $dbName.'_'. uniqid();	
 			}
 			else
 			{
-				$user->database = $context->config->database;
+				$user->database = $dbName;
 			}
 			
 			$user->save($context);

@@ -147,7 +147,7 @@ class Field
 
 	function asCountry()
 	{		
-		$this->asEnum('countries');
+		$this->asEnum('country');
 		return $this;
 	}
 
