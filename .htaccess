@@ -1,10 +1,12 @@
 RewriteEngine on
-RewriteRule auth index.php?module=auth
-RewriteRule dashboard index.php?module=dashboard
-RewriteRule clients index.php?module=clients
-RewriteRule users index.php?module=users
-RewriteRule categories index.php?module=categories
-RewriteRule products index.php?module=products
-RewriteRule documents index.php?module=documents
-RewriteRule connectors index.php?module=connectors
-RewriteRule settings index.php?module=settings
+RewriteRule ^auth index.php?module=auth
+RewriteRule ^dashboard index.php?module=dashboard
+RewriteRule ^clients index.php?module=clients
+RewriteRule ^users index.php?module=users
+RewriteRule ^categories index.php?module=categories
+RewriteRule ^products index.php?module=products
+RewriteRule ^documents index.php?module=documents
+RewriteRule ^connectors index.php?module=connectors
+RewriteRule ^settings index.php?module=settings
+RewriteRule ^(api)\/(\w+)\/(\w*)\/(\d*) index.php?module=$2&action=api&call=$3&id=$4 [QSA,L]
+RewriteRule ^(api)\/(\w+)\/(\w*) index.php?module=$2&action=api&call=$3 [QSA,L]

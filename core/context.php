@@ -14,11 +14,11 @@ class Context {
 		$this->modules = array ();
 		
 		$this->outputTarget = $this->loadVarFromRequest('target', 'main');
-		
-		$this->language = $this->loadVar('language', 'pt');
-		
+			
 		$this->config = new Config();
 
+		$this->language = $this->loadVar('language', $this->config->defaultLanguage);
+		
 		$this->initDatabase();
 			
 		if ($this->hasLogin)
@@ -83,7 +83,7 @@ class Context {
 			return;
 		}			
 	
-		$module = $this->loadVar('module', 'auth');
+		$module = $this->loadVar('module', $this->config->defaultModule);
 		$this->changeModule($module);
 		
 		$view = $this->loadVar('view', $this->module->defaultAction);
@@ -105,6 +105,7 @@ class Context {
 				$name = $module->name;
 				$htaccessData .= "RewriteRule $name index.php?module=$name\n";
 			}
+			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*) core/api.php?module=$2&action=$3 [QSA,L]'."\n";
 			file_put_contents('.htaccess', $htaccessData);
 		}
 		
@@ -126,6 +127,14 @@ class Context {
 		}
 		
 		$this->prepare();
+			
+		if ($action == 'api')
+		{
+			$call = $this->loadVarFromRequest('call', 'list');
+			$this->module->API($this, $call);
+			die();
+		}
+		
 		$this->loadMenus();
 
 		ob_start();

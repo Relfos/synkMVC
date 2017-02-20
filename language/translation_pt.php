@@ -27,9 +27,11 @@ function loadTranslation()
 	
 	'grid_title_search' => 'Pesquisa',	
 	'grid_title_edit' => 'Edição',	
+	'grid_title_export' => 'Exportação',	
 	
 	'grid_label_value' => 'Valor',	
 	'grid_label_field' => 'Campo',	
+	'grid_label_export_formats' => 'Os seguintes formatos estão disponiveis para exportação de dados.',	
 	
 	'grid_prompt_warning' => 'Não será possivél voltar atrás.',
 	'grid_prompt_delete' => 'Tem a certeza que quer apagar esta entidade?',

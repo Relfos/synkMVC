@@ -22,6 +22,8 @@ if (!file_exists("config.php"))
 	$config->sqlPass = '';
 	$config->defaultUser = 'admin';
 	$config->defaultPass = 'test';
+	$config->defaultModule = 'auth';
+	$config->defaultLanguage = 'pt';
 	saveConfiguration($config);	
 }
 
