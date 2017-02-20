@@ -187,6 +187,9 @@ class mysqlPlugin extends DatabasePlugin
 		$this->selectDatabase($dbName);
 		$query = "INSERT INTO `$table` ($fieldList) VALUES($valueList)";	
 		$this->query($query);
+		
+		$newID = mysqli_insert_id($this->client);
+		return $newID;
 	}
 	
 	//*******************
@@ -201,7 +204,7 @@ class mysqlPlugin extends DatabasePlugin
 		$this->context->log($this->context->getCallstack());
 		
 		//echo $query."<br>";		die();
-		$result = mysqli_query($this->client,$query);
+		$result = mysqli_query($this->client, $query);
 		if(!$result) 
 		{
 			$this->fail($this->client->error."<br>".$query);

@@ -113,6 +113,8 @@ class mongoPlugin extends DatabasePlugin
 		//echo $table.'<br>';
 		//var_dump($fields);die();
 		$this->db->$table->insert($fields);
+		$newID = $field['_id']->{'$id'};
+		return $newID;
 	}
 	
 	//*******************				

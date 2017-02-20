@@ -48,6 +48,19 @@ class Entity
 		}
 	}
 	
+	public function getFields()
+	{
+		$result = array();
+		foreach($this->fields as $field) 
+		{
+			$fieldName = $field->name;
+			$fieldValue = $this->$fieldName;
+		
+			$result[$fieldName] = $fieldValue;
+		}
+		return $result;
+	}
+	
 	public function loadFromRow($row)
 	{
 		if (is_null($row))
@@ -96,14 +109,7 @@ class Entity
 		$dbName = $this->dbName;
 		$tableName = $this->tableName;
 		
-		$dbFields = array();
-		foreach($this->fields as $field) 
-		{
-			$fieldName = $field->name;
-			$fieldValue = $this->$fieldName;
-		
-			$dbFields[$fieldName] = $fieldValue;
-		}
+		$dbFields = $this->getFields();
 			
 		if ($this->exists)
 		{
@@ -112,7 +118,7 @@ class Entity
 		else
 		{			
 			$dbFields['insertion_date'] = $this->insertion_date;
-			$context->database->insertObject($dbName, $tableName, $dbFields);
+			$this->id = $context->database->insertObject($dbName, $tableName, $dbFields);
 			$this->exists = true;
 		}		
 	}
