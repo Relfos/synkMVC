@@ -2,20 +2,20 @@
 
 class Client extends Entity {
 	function __construct($context) {
-		$this->registerField('name')->asString(30)->showInGrid()->setLabel('Nome');
-		$this->registerField('vat')->asString(12)->setLabel('NIF');
-		$this->registerField('address')->asText()->setLabel('Morada');
-		$this->registerField('city')->asString(20)->showInGrid()->setLabel('Cidade');
-		$this->registerField('zip_code')->asString(8)->setLabel('Código Postal');
-		$this->registerField('country')->asCountry()->showInGrid()->setLabel('País');
-		$this->registerField('email')->asEmail()->makeOptional()->showInGrid()->setLabel('Email');
-		$this->registerField('website')->asURL()->makeOptional()->setLabel('Website');
-		$this->registerField('phone')->asPhone()->makeOptional()->showInGrid()->setLabel('Telefone');
-		$this->registerField('fax')->asPhone()->makeOptional()->setLabel('Fax');
-		$this->registerField('notes')->asText()->makeOptional()->setLabel('Notas');
-		$this->registerField('discount')->asPercent()->makeOptional()->setLabel('Desconto');
-		$this->registerField('document_copies')->asInt()->makeOptional()->setLabel('Cópias de Documento');
-		$this->registerField('payment_day')->asInt()->makeOptional()->setLabel('Dia de Pagamento');
+		$this->registerField('name')->asString(30)->showInGrid();
+		$this->registerField('vat')->asString(12);
+		$this->registerField('address')->asText();
+		$this->registerField('city')->asString(20)->showInGrid();
+		$this->registerField('zip_code')->asString(8);
+		$this->registerField('country')->asCountry()->showInGrid();
+		$this->registerField('email')->asEmail()->makeOptional()->showInGrid();
+		$this->registerField('website')->asURL()->makeOptional();
+		$this->registerField('phone')->asPhone()->makeOptional()->showInGrid();
+		$this->registerField('fax')->asPhone()->makeOptional();
+		$this->registerField('notes')->asText()->makeOptional();
+		$this->registerField('discount')->asPercent()->makeOptional();
+		$this->registerField('document_copies')->asInt()->makeOptional();
+		$this->registerField('payment_day')->asInt()->makeOptional();
 		//$this->registerField('maturity_date')->makeOptional();
 		//$this->registerField('payment_method')->makeOptional();
 		//$this->registerField('delivery_method')->makeOptional();

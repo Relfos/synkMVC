@@ -13,8 +13,9 @@ class Entity
 	public $fields = array();
 	public $exists = false;
 	
-	function __construct($context) {
+	function __construct($context) {		
 		$className = get_class($this);
+		$this->className = $className;
 		$dbName = $context->dbName;
 		
 		if (is_null($this->tableName))
@@ -48,14 +49,19 @@ class Entity
 		}
 	}
 	
-	public function getFields()
+	public function getFields($skipHidden = false)
 	{
 		$result = array();
 		foreach($this->fields as $field) 
 		{
+			if ($skipHidden && $field->hidden)
+			{
+				continue;
+			}
+			
 			$fieldName = $field->name;
 			$fieldValue = $this->$fieldName;
-		
+					
 			$result[$fieldName] = $fieldValue;
 		}
 		return $result;
@@ -157,6 +163,11 @@ class Entity
 		}
 		
 		return null;		
+	}
+	
+	public function translateField($context, $field)
+	{
+		return $context->translate('entity_'. strtolower($this->className) .'_'.$field->name);
 	}
 	
 }

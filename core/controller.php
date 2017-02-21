@@ -106,7 +106,7 @@ class Controller {
 		foreach($entity->fields as $field) {
 			if (!$field->hidden)
 			{
-				$headers[] = array('name' => $field->name, 'label' => $field->label, 'visible' => $field->grid);	
+				$headers[] = array('name' => $field->name, 'label' => $entity->translateField($context, $field), 'visible' => $field->grid);	
 			}			
 		}
 
@@ -218,7 +218,7 @@ class Controller {
 				
 				$columns[] = array(
 					'name' => $field->name, 
-					'label' => $field->label, 
+					'label' => $entity->translateField($context, $field), 
 					'value' => $fieldValue, 
 					'maskedValue' => $maskedValue,
 					'visible' => $field->grid, 

@@ -3,7 +3,6 @@
 class Field
 {
 	public $name;
-	public $label;
 	public $dbType;
 	public $formType = 'text';
 	public $formClass = '';
@@ -18,7 +17,6 @@ class Field
 	
 	function __construct($name) {
 		$this->name = $name;
-		$this->label = $name;
 	}
 	
 	function makeOptional()
@@ -33,12 +31,6 @@ class Field
 		return $this;
 	}
 	
-	function setLabel($val)
-	{
-		$this->label = $val;
-		return $this;
-	}
-
 	function showInGrid()
 	{
 		$this->grid = true;
@@ -181,7 +173,6 @@ class Field
 			return $value;	
 		}		
 	}*/
-	
 }
 
 

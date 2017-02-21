@@ -92,7 +92,7 @@ class Module
 					$content = array();
 					foreach ($entities as $entity)
 					{
-						$fields = $entity->getFields();
+						$fields = $entity->getFields();						
 						array_push($content, $fields);
 					}					
 					break;

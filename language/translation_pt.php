@@ -13,6 +13,38 @@ function loadTranslation()
 	'module_connectors' => 'Conectores',
 	'module_settings' => 'Configuração',
 	
+	'entity_client_name' => 'Nome',
+	'entity_client_vat' => 'NIF',
+	'entity_client_address' => 'Morada',
+	'entity_client_city' => 'Cidade',
+	'entity_client_zip_code' => 'Código Postal',
+	'entity_client_country' => 'País',
+	'entity_client_email' => 'Email',
+	'entity_client_website' => 'Website',
+	'entity_client_phone' => 'Telefone',
+	'entity_client_fax' => 'Fax',
+	'entity_client_notes' => 'Notas',
+	'entity_client_discount' => 'Desconto',
+	'entity_client_document_copies' => 'Cópias de Documento',
+	'entity_client_payment_day' => 'Dia de Pagamento',
+
+	'entity_user_name' => 'Nome',
+	'entity_user_hash' => 'Hash',
+	'entity_user_database' => 'Base de Dados',
+
+	'entity_category_name' => 'Nome',
+	'entity_category_parent' => 'Categoria Base',
+	'entity_category_description' => 'Descrição',
+	
+	'entity_product_name' => 'Nome',
+	'entity_product_category' => 'Categoria',
+	'entity_product_type' => 'Tipo',
+	'entity_product_reference' => 'Referência',
+	'entity_product_description' => 'Descrição',
+	'entity_product_price' => 'Preço',
+	'entity_product_picture' => 'Foto',
+		
+	
 	'grid_error_empty' => 'Não existem dados disponiveis no módulo $name.',
 	'grid_action_create' => 'Criar',
 	'grid_action_delete' => 'Apagar',	
