@@ -71,6 +71,10 @@ function loadTranslation()
 	'site_logout' => 'Sair',	
 	'site_searchbox' => 'Procure por clientes, produtos, etc...',
 	
+	'enum_product_type_product' => 'Produto', 
+	'enum_product_type_service' => 'Serviço', 
+	'enum_product_type_other' => 'Outro',
+	
 	'enum_country_AF' => 'Afeganistão',
 	'enum_country_ZA' => 'África do Sul',
 	'enum_country_AL' => 'Albânia',

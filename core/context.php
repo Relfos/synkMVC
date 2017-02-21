@@ -46,7 +46,7 @@ class Context {
 			{
 				require_once ('enums.php');
 				$this->createEnum("country", getCountryList());
-				$this->createEnum('product_type', array('Produto', 'Serviço', 'Outro'));
+				$this->createEnum('product_type', array('product', 'service', 'other'));
 			}					
 		}	
 		else
