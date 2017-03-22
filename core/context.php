@@ -51,8 +51,8 @@ class Context {
 				$this->createEnum('product_type', array('product', 'service', 'other'));
 			}					
 			
-			$userID = $_SESSION['user_id'];
-			$this->user = $this->database->fetchEntityByID($this, 'user', $userID);
+			$user_id = $_SESSION['user_id'];
+			$this->user = $this->database->fetchEntityByID($this, 'user', $user_id);
 		}	
 		else
 		{
@@ -78,7 +78,7 @@ class Context {
 		$this->database = new $dbClassName($this);
 	}
 	
-	public function prepare()
+	public function prepare($action)
 	{			
 		if ($this->database->failed)
 		{
@@ -91,11 +91,11 @@ class Context {
 		$this->changeModule($module);
 		
 		$view = $this->loadVar('view', $this->module->defaultAction);
-		
-		if ($this->hasLogin && $this->module->name == 'auth' && $view == $this->module->defaultAction) {
+				
+		if ($this->hasLogin && $this->module->name == 'auth' && $this->curView == $this->module->defaultAction && $action != 'logout') {
 			$this->changeModule('dashboard');
 		}
-		
+				
 		if (!$this->module->hasAccess($this, $view))
 		{
 			$this->changeModule('auth');
@@ -127,7 +127,7 @@ class Context {
 		if (is_null($action))
 		{
 			$action = $this->loadVarFromRequest('action', 'page');
-
+			
 			if ($action == 'page') 
 			{
 				$this->pushTemplate('header');
@@ -136,7 +136,7 @@ class Context {
 			}
 		}
 		
-		$this->prepare();
+		$this->prepare($action);
 			
 		if ($action == 'api')
 		{
@@ -334,6 +334,8 @@ class Context {
 		$_SESSION['user_id'] = $user_id;
 		$_SESSION['user_db'] = $user_db;
 		$this->hasLogin = true;
+		$this->user = $this->database->fetchEntityByID($this, 'user', $user_id);
+		$this->loadMenus();
 	}
 
 	function logOut()
