@@ -4,20 +4,38 @@ class Module
 {
 	public $name;
 	public $title;
-	public $needAuth = false;
 	public $defaultAction = 'default';
 	public $entity = null;
 	public $menu = null;
+	
+	private $permCallback = null;
 	
 	function __construct($name) {
 		$this->name = $name;	
 		$this->title = $name.'???';	
 	}
 	
-    public function requireAuth() {		
-		$this->needAuth = true;		
+    public function setPermissions($callback) {		
+		$this->permCallback = $callback;		
 		return $this;
     }
+	
+	public function hasAccess($context, $action)	{
+		if (is_null($this->permCallback)) {
+			return true;
+		}
+		
+		if (is_null($context->user)) {
+			return false;
+		}
+			
+		if (is_null($action)) {
+			return false;
+		}
+
+		$callback = $this->permCallback;
+		return $callback($context->user, $this, $action);
+	}
 		
     public function setDefaultAction($action) {		
 		$this->defaultAction = $action;		

@@ -7,10 +7,12 @@ class Context {
 	public $outputTarget;
 	public $templateStack = array();
 	
+	public $user = null;
+	
 	public $text = null;
 	
 	function __construct() {
-		$this->hasLogin = isset($_SESSION['user_id']);		
+		$this->hasLogin = isset($_SESSION['user_id']);
 		$this->modules = array ();
 		
 		$this->outputTarget = $this->loadVarFromRequest('target', 'main');
@@ -33,7 +35,7 @@ class Context {
 			);
 			
 			$this->database->createTable($dbName, 'enums', $fields, 'name');
-											
+															
 			/*$this->sql->query("CREATE TABLE IF NOT EXISTS $databaseName.enums (
 			`name` VARCHAR(30) NOT NULL,
 			`values` TEXT NOT NULL,
@@ -48,6 +50,9 @@ class Context {
 				$this->createEnum("country", getCountryList());
 				$this->createEnum('product_type', array('product', 'service', 'other'));
 			}					
+			
+			$userID = $_SESSION['user_id'];
+			$this->user = $this->database->fetchEntityByID($this, 'user', $userID);
 		}	
 		else
 		{
@@ -86,14 +91,19 @@ class Context {
 		$this->changeModule($module);
 		
 		$view = $this->loadVar('view', $this->module->defaultAction);
-		$this->changeView($view);		
 		
-		if ($this->module->needAuth && !$this->hasLogin)
+		if ($this->hasLogin && $this->module->name == 'auth' && $view == $this->module->defaultAction) {
+			$this->changeModule('dashboard');
+		}
+		
+		if (!$this->module->hasAccess($this, $view))
 		{
 			$this->changeModule('auth');
+			$this->changeView('forbidden');		
 		}
 		else
 		{
+			$this->changeView($view);		
 			$this->filter = $this->loadVar('filter', null);	
 		}							
 		
@@ -233,13 +243,16 @@ class Context {
 			{
 				continue;
 			}
-			
+							
 			$link = $module->getLink();
-			if (is_null($link))
-			{
+			if (is_null($link)) {
 				continue;
 			}
 			
+			if (!$module->hasAccess($this, $module->defaultAction)){
+				continue;
+			}
+
 			$index = $this->findMenuIndex($module->menu);
 			$this->menus[$index]['items'][] = array('label' => $module->getTitle($this), 'link' => $link);
 		}				

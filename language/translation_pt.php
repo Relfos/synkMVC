@@ -3,7 +3,7 @@
 function loadTranslation()
 {
 	return array(
-	'module_auth' => 'Login',
+	'module_auth' => 'Autenticação',
 	'module_dashboard' => 'Dashboard',
 	'module_clients' => 'Clientes',
 	'module_users' => 'Utilizadores',

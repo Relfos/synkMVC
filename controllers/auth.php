@@ -28,7 +28,7 @@ class AuthController extends Controller {
 	   if ($this->checkPassword($password, $row['hash']))
 	   {
 			$context->logIn($row['id'], $row['database']);
-			$context->changeModule('dashboard');		   
+			$context->changeModule('dashboard');
 			$context->reload();
 	   }
 	   else
