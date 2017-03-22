@@ -154,14 +154,13 @@ class mysqlPlugin extends DatabasePlugin
 			}
 			
 			$fieldValue = $this->encodeField($fieldValue);
-			$query .= "$fieldName=$fieldValue";						
+			$query .= "`$fieldName`=$fieldValue";						
 			$i++;
 		}
-
+	
 		$this->selectDatabase($dbName);
-		$condition = $this->compileCondition($condition);
 		$value = $this->encodeField($value);
-		$query = "UPDATE $table SET $query WHERE $key = $value";	
+		$query = "UPDATE $table SET $query WHERE $key = $value";		
 		$this->query($query);
 	}
 	

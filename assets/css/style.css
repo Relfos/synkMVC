@@ -324,8 +324,17 @@ a:focus {
 }
 
 /* Footer */
+.footer {
+}
+
 #footerwrap {
-	padding-top: 60px;
+	position: absolute;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 1rem;
+
+  padding-top: 60px;
 	padding-bottom: 60px;
 	background: #384452;
 	 box-shadow: 0px 500px 0px 500px #384452;

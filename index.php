@@ -4,7 +4,7 @@
 require_once('core/init.php');
 
 $checkPerm = function($user, $module, $action) {
-	if ($module->name == 'clients')	{
+	if ($module->name == 'users' && !$user->admin)	{
 		return false;
 	}
 		

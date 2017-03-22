@@ -8,6 +8,7 @@ class User extends Entity {
 		$this->registerField('name')->asString(30)->showInGrid();
 		$this->registerField('hash')->asString(40)->makeHidden();
 		$this->registerField('database')->asString(80);
+		$this->registerField('admin')->asBoolean();
 				
 		parent::__construct($context);
 	}
