@@ -47,7 +47,7 @@
 					{{/thumb}}
 					<script>
 						$("#fileuploader").uploadFile({
-							url:"core/upload.php",
+							url:"upload.php",
 							dataType: "json",
 							fileName:"target",
 							multiple:false,
@@ -64,7 +64,7 @@
 								console.log(data);
 								data = data[0];
 								console.log(data);
-								$("#{{name}}").val(data.location);
+								$("#{{name}}").val(data.id);
 							}
 						});
 					</script>			

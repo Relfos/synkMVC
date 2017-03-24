@@ -32,6 +32,10 @@ function loadTranslation()
 	'entity_user_hash' => 'Hash',
 	'entity_user_database' => 'Base de Dados',
 
+	'entity_document_vat' => 'NIF',
+	'entity_document_date' => 'Data',
+	'entity_document_items' => 'Items',
+
 	'entity_category_name' => 'Nome',
 	'entity_category_parent' => 'Categoria Base',
 	'entity_category_description' => 'Descrição',

@@ -43,6 +43,22 @@ class Field
 		return $this;
 	}
 	
+	function asDate()
+	{
+		$this->dbType = 'datetime';
+		$this->defaultValue = date('Y-m-d');
+		$this->formType = 'date';
+		return $this;
+	}
+
+	function asCollection($entity)
+	{
+		$this->dbType = 'mediumtext';
+		$this->defaultValue = '';
+		$this->formType = 'table';
+		$this->entity = $entity;
+		return $this;
+	}
 
 	function asInt()
 	{
@@ -96,7 +112,7 @@ class Field
 	
 	function asFile()
 	{
-		$this->dbType = "varchar(40)";		
+		$this->dbType = "int";		
 		$this->defaultValue = '';
 		$this->formType = 'file';
 		return $this;

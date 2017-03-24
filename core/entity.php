@@ -12,6 +12,7 @@ class Entity
 	public $dbName = null;
 	public $fields = array();
 	public $exists = false;
+	public $isWritable = true;
 	
 	function __construct($context) {		
 		$className = get_class($this);
@@ -29,23 +30,26 @@ class Entity
 		}
 
 		$this->insertion_date = time();
+				
+		if ($this->isWritable) {
+			global $entity_init;
 		
-		$dbFields = array();
-		foreach($this->fields as $field) 
-		{
-			$fieldName = $field->name;
-			$fieldType = $field->dbType;
-			$this->$fieldName = $field->defaultValue;
+			$dbFields = array();
+			foreach($this->fields as $field) 
+			{
+				$fieldType = $field->dbType;
+								
+				$fieldName = $field->name;
+				$this->$fieldName = $field->defaultValue;
+			
+				$dbFields[$fieldName] = $fieldType;
+			}
 		
-			$dbFields[$fieldName] = $fieldType;
-		}
-		
-		global $entity_init;
-		
-		if (!array_key_exists ($className, $entity_init))
-		{
-			$entity_init[$className] = true;			
-			$context->database->createTable($this->dbName, $this->tableName, $dbFields);			
+			if (!array_key_exists ($className, $entity_init))
+			{
+				$entity_init[$className] = true;			
+				$context->database->createTable($this->dbName, $this->tableName, $dbFields);			
+			}
 		}
 	}
 	
@@ -54,11 +58,10 @@ class Entity
 		$result = array();
 		foreach($this->fields as $field) 
 		{
-			if ($skipHidden && $field->hidden)
-			{
+			if ($skipHidden && $field->hidden) {
 				continue;
 			}
-			
+						
 			$fieldName = $field->name;
 			$fieldValue = $this->$fieldName;
 					
@@ -79,7 +82,7 @@ class Entity
 		
 		foreach($this->fields as $field) {
 			$fieldName = $field->name;
-			if (array_key_exists ($fieldName , $row ))
+			if (array_key_exists($fieldName , $row ))
 			{
 				$this->$fieldName = $row[$fieldName];
 			}
@@ -96,22 +99,25 @@ class Entity
 			
 			if ($field->formType == 'file')
 			{
+				$fieldValue = $this->$fieldName;
+				
+				
+				$upload = $context->database->fetchEntityByID($context, "upload", $fieldValue);
+
+				//var_dump($upload->thumb); die();
+				
 				$fieldData = $fieldName.'_thumb';				
-				$hash = $this->$fieldName;
-				if (strlen($hash)>0)
-				{
-					$cond = array("hash" => array('eq' => $hash));
-					$row = $context->database->fetchObject($dbName, 'uploads', $cond);	
-					$thumb = $row['thumb'];
-					//echo $hash; die();
-					$this->$fieldData = $thumb;					
-				}
+				$this->$fieldData = $upload->thumb;
 			}
 		}				
 	}
 	
 	public function save($context)
 	{	
+		if (!$this->isWritable) {
+			return false;
+		}
+		
 		$dbName = $this->dbName;
 		$tableName = $this->tableName;
 		
@@ -126,7 +132,9 @@ class Entity
 			$dbFields['insertion_date'] = $this->insertion_date;
 			$this->id = $context->database->insertObject($dbName, $tableName, $dbFields);
 			$this->exists = true;
-		}		
+		}	
+
+		return true;		
 	}
 	
 	public function remove($context)
@@ -170,6 +178,10 @@ class Entity
 		return $context->translate('entity_'. strtolower($this->className) .'_'.$field->name);
 	}
 	
+	public function toString() {
+		$className = get_class($this);
+		return $className;
+	}
 }
 
 ?>

@@ -150,7 +150,12 @@ class Controller {
 				{
 					$isUpload = true;
 					$fieldData = $fieldName.'_thumb';
-					$thumb = $entity->$fieldData;
+					if (isset($entity->$fieldData)) {
+						$thumb = $entity->$fieldData;
+					}
+					else {
+						$thumb = null;
+					}
 				}
 				else
 				{
@@ -201,14 +206,14 @@ class Controller {
 				if (!is_null($field->entity))
 				{
 					$entityID = $fieldValue;
-					if (strcmp($fieldValue, '0')===0)
+					if (strlen($fieldValue) == 0 || strcmp($fieldValue, '0')===0)
 					{
 						$maskedValue = '-';
 					}
 					else
 					{
 						$otherEntity = $context->database->fetchEntityByID($context, $field->entity, $fieldValue);	
-						$maskedValue = $otherEntity->name;						
+						$maskedValue = $otherEntity->toString();						
 					}
 				}
 				else

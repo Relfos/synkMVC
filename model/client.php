@@ -23,6 +23,10 @@ class Client extends Entity {
 		parent::__construct($context);
 	}
 
+	function toString() {
+		return $this->name;
+	}
+	
 }
 
 ?>
