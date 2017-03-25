@@ -5,25 +5,77 @@
 		<label for="{{name}}" class="control-label">{{label}}</label>
 
 		{{#entity}}
-			<input class="hidden" type="text" id="{{name}}" value="{{entityID}}">
+			<input class="hidden" type="text" id="{{name}}" value="{{entityID}}">			
+			<input id="{{name}}_search" class="form-control {{#isTable}}form_search{{/isTable}}" value="{{maskedValue}}">		
+			{{#isTable}}
+			<button type="button" id="{{name}}_add" class="btn btn-info" style="width:12%">Add</button>
+			<div class="form-group">&nbsp;</div>
+				<ul class="list-group" id="{{name}}_list">
+					{{#items}}
+					<li class="list-group-item">{{label}}</li>
+					{{/items}}
+				</ul>				
 			
-			<input id="{{name}}_search" class="form-control" value="{{maskedValue}}">
-			
+			{{/isTable}}
 			<script> 			
+			var item_{{name}} = "0";
+			var label_{{name}} = "";
+								
+			{{#isTable}}
+			$( "#{{name}}_add" ).click(function (){								
+				var value = item_{{name}};
+				if (value == "0") {
+					return;
+				}
+
+				$( "#{{name}}_search" ).val('');
+				item_{{name}} = 0;
+
+				var itemLabel = label_{{name}};
+				
+				var input = $( "#{{name}}" );
+				var temp = input.val();
+				
+				var tag = value+',';
+				if (temp.includes(tag)) {
+					bootbox.alert("'"+itemLabel+"' is already in the set!");
+					return;
+				}
+				
+				input.val(temp + tag);
+
+				var ul = document.getElementById("{{name}}_list");
+				var li = document.createElement("li");
+				li.appendChild(document.createTextNode(itemLabel));
+				li.className = 'list-group-item';
+				ul.appendChild(li);				
+			
+			});
+			{{/isTable}}
+
 			$( "#{{name}}_search" ).autocomplete({
-				source: 'index.php?module={{module.name}}&action=json&class={{entity}}',
+				source: 'index.php?module={{module.name}}&action=json&class={{entity}}{{#isTable}}&required=true{{/isTable}}',
 				minLength: 2,
 				select: function( event, ui ) {
 					event.preventDefault();
 					//alert( "Selected: " + ui.item.value + " aka " + ui.item.label );
 					
 					var item = ui.item;
-					if (item.label == 'Nenhum')
+					if (item.value == '0')
 					{
 						item.label = '-';
 					}
 					$("#{{name}}_search").val(item.label);
+					
+					{{#isTable}}
+					item_{{name}} = item.value;
+					label_{{name}} = item.label;
+					{{/isTable}}
+
+					{{^isTable}}
 					$("#{{name}}").val(item.value);
+					{{/isTable}}
+					
 				  }
 				});			
 			</script>

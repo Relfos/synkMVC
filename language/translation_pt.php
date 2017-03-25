@@ -3,6 +3,8 @@
 function loadTranslation()
 {
 	return array(
+	'system_none' => 'Nenhum',
+	
 	'module_auth' => 'Autenticação',
 	'module_dashboard' => 'Dashboard',
 	'module_clients' => 'Clientes',

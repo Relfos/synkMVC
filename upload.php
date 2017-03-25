@@ -1,6 +1,8 @@
 <?php
+error_reporting(E_ERROR | E_PARSE);
 
-//error_reporting(E_ERROR | E_PARSE);
+require_once('core/init.php');
+$context = new Context();
 
 function make_thumb($src, $extension) 
 {
@@ -42,8 +44,7 @@ function make_thumb($src, $extension)
 	return $imageString;
 }
 
-function upload_file($context, $fileName, $tempName)
-{	
+function upload_file($context, $fileName, $tempName) {	
 	$hash = md5_file($tempName);
 
 	$condition = array('hash' => array('eq' => $hash));
@@ -78,19 +79,7 @@ function upload_file($context, $fileName, $tempName)
 	return array('id' => $entity->id, 'name' => $fileName, 'hash' => $hash, 'skipped' => $skipped);	
 }
 
-require_once('core/init.php');
 
-$checkPerm = function($user, $module, $action) {
-	if ($module->name == 'users' && !$user->admin)	{
-		return false;
-	}
-		
-	return true;
-};
-
-$context = new Context();
-
-	
 if(isset($_FILES["target"]))
 {
 	$ret = array();

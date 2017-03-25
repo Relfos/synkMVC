@@ -51,7 +51,7 @@ class Field
 		return $this;
 	}
 
-	function asCollection($entity)
+	function asList($entity)
 	{
 		$this->dbType = 'mediumtext';
 		$this->defaultValue = '';

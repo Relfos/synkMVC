@@ -582,6 +582,11 @@ text-transform: uppercase;
   vertical-align: middle;
 }
 
+.form_search {
+  display:inline;
+  width:80%;
+}
+
 #main {
   min-height:100px;
 }

@@ -203,22 +203,44 @@ class Controller {
 					$options = array();
 				}					
 
+				$items = array();
 				if (!is_null($field->entity))
 				{
 					$entityID = $fieldValue;
-					if (strlen($fieldValue) == 0 || strcmp($fieldValue, '0')===0)
-					{
-						$maskedValue = '-';
-					}
-					else
-					{
-						$otherEntity = $context->database->fetchEntityByID($context, $field->entity, $fieldValue);	
-						$maskedValue = $otherEntity->toString();						
+					$isTable = $field->formType == 'table';
+					
+					if ($isTable) {
+						$entityList = explode(',', $entityID);
+						foreach ($entityList as $id) {
+							if (strlen($id)==0) {
+								break;
+							}
+							$otherEntity = $context->database->fetchEntityByID($context, $field->entity, $id);	
+							$items[] = array("id" => $id, "label" => $otherEntity->toString());
+						}
+						
+						$maskedValue = '';
+					}				
+					else {
+						if (strlen($fieldValue) == 0 || strcmp($fieldValue, '0')===0)
+						{
+							$maskedValue = '-';
+						}
+						else
+						{
+							$otherEntity = $context->database->fetchEntityByID($context, $field->entity, $fieldValue);	
+							$maskedValue = $otherEntity->toString();						
+						}						
 					}
 				}
 				else
 				{
+					$isTable = false;
 					$entityID = null;
+				}
+				
+				if ($field->formType == 'date') {
+					$fieldValue = date("Y-m-d", 1010310);
 				}
 				
 				$columns[] = array(
@@ -238,6 +260,8 @@ class Controller {
 					'thumb' => $thumb,
 					'unit' => $field->unit,
 					'isUpload' => $isUpload,
+					'isTable' => $isTable,
+					'items' => $items,
 					'hasContent' => $hasContent
 					);
 					

@@ -142,7 +142,8 @@ class ModelController extends Controller {
 		
 		if (!isset($_REQUEST['required']))
 		{
-			echo '{"label" :"Nenhum", "value": 0}';
+			$none = $context->translate('system_none');
+			echo '{"label" : "'.$none.'", "value": "0"}';
 			$i++;
 		}
 			
@@ -154,7 +155,7 @@ class ModelController extends Controller {
 			}
 			
 			$name = $entity->name;
-			echo '{"label" :"'.$name.'", "value": '.$entity->id.'}';
+			echo '{"label" :"'.$name.'", "value": "'.$entity->id.'"}';
 			$i++;
 		}
 		echo ']';
