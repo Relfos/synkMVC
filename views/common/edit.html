@@ -6,22 +6,55 @@
 
 		{{#entity}}
 			<input class="hidden" type="text" id="{{name}}" value="{{entityID}}">			
-			<input id="{{name}}_search" class="form-control {{#isTable}}form_search{{/isTable}}" value="{{maskedValue}}">		
+
 			{{#isTable}}
-			<button type="button" id="{{name}}_add" class="btn btn-info" style="width:12%">Add</button>
-			<div class="form-group">&nbsp;</div>
-				<ul class="list-group" id="{{name}}_list">
+			<div class="control-group" id="{{name}}_list">
+					<form role="form" autocomplete="off" >
+						<div class="entry input-group col-xs-12" style="margin-bottom: 10px;">
+							<input class="form-control" name="fields[]" type="text" placeholder="Type something" id="{{name}}_search"  />
+							<span class="input-group-btn">
+								<button class="btn btn-success btn-add" type="button" id="{{name}}_add">
+									<span class="glyphicon glyphicon-plus"></span>
+								</button>
+							</span>
+						</div>
+						
 					{{#items}}
-					<li class="list-group-item">{{label}}</li>
+						<div class="input-group col-xs-12" id="item_{{name}}_{{id}}">
+							<li class="list-group-item">{{label}}</li>
+							<span class="input-group-btn">
+								<button class="btn btn-danger btn-remove" type="button" onclick="delete_{{name}}_item({{id}})">
+									<span class="glyphicon glyphicon-minus"></span>
+								</button>
+							</span>
+						</div>					
 					{{/items}}
-				</ul>				
+						
+				</div>
+			</div>					
 			
 			{{/isTable}}
+			{{^isTable}}
+			<input id="{{name}}_search" class="form-control {{#isTable}}form_search{{/isTable}}" value="{{maskedValue}}">		
+			{{/isTable}}
+			
+			
 			<script> 			
 			var item_{{name}} = "0";
 			var label_{{name}} = "";
 								
 			{{#isTable}}
+			function delete_{{name}}_item(value){
+				var input = $( "#{{name}}" );
+				var temp = input.val();
+
+				var tag = value + ',';
+				temp = temp.replace(tag, ''); 				
+				input.val(temp);
+				
+				$( "#item_{{name}}_"+value ).remove();				
+			}
+			
 			$( "#{{name}}_add" ).click(function (){								
 				var value = item_{{name}};
 				if (value == "0") {
@@ -45,11 +78,37 @@
 				input.val(temp + tag);
 
 				var ul = document.getElementById("{{name}}_list");
+				
+				var div = document.createElement("div");
+				div.classList.add('input-group');
+				div.classList.add('col-xs-12');
+				div.setAttribute('id', 'item_{{name}}_'+value);
+				ul.appendChild(div);
+
 				var li = document.createElement("li");
 				li.appendChild(document.createTextNode(itemLabel));
 				li.className = 'list-group-item';
-				ul.appendChild(li);				
-			
+				div.appendChild(li);
+				
+				var span = document.createElement("span");
+				span.classList.add('input-group-btn');
+				div.appendChild(span);
+						
+				var btn = document.createElement("button");
+				btn.setAttribute("type", "button");
+				btn.classList.add('btn');
+				btn.classList.add('btn-danger');
+				btn.classList.add('btn-remove');
+				span.appendChild(btn);
+				
+				var span2 = document.createElement("span");
+				span2.classList.add('glyphicon');
+				span2.classList.add('glyphicon-minus');
+				btn.appendChild(span2);			
+
+				btn.addEventListener("click", function() {
+					delete_{{name}}_item(value);
+				});
 			});
 			{{/isTable}}
 
