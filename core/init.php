@@ -6,6 +6,9 @@ error_reporting(E_ALL);
 //error_reporting(E_ERROR | E_WARNING | E_PARSE);
 //error_reporting(E_ERROR | E_PARSE);
 
+$sessionPath = getcwd(). '/tmp';
+mkdir($sessionPath);
+ini_set('session.save_path', $sessionPath);
 session_start();
 
 require_once('core/utils.php');
