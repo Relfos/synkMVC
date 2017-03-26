@@ -10,7 +10,7 @@ class Context {
 	
 	public $text = null;
 	
-	private $menus = array();
+	public $menus = array();
 	
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);
@@ -53,7 +53,7 @@ class Context {
 			}					
 			
 			$user_id = $_SESSION['user_id'];
-			$this->user = $this->database->fetchEntityByID($this, 'user', $user_id);
+			$this->user = $this->database->fetchEntityByID($this, 'user', $user_id);		
 		}	
 		else
 		{
@@ -100,7 +100,7 @@ class Context {
 		if ($this->hasLogin && $this->module->name == 'auth' && $this->curView == $this->module->defaultAction && $action != 'logout') {
 			$this->changeModule($this->config->defaultModule);
 		}
-				
+
 		if (!$this->module->hasAccess($this, $view))
 		{
 			$this->changeModule('auth');
@@ -249,10 +249,12 @@ class Context {
 		return $i;
 	}
 	
-	function loadMenus()
-	{			
-		$this->menus[] = array('title' => 'Dashboard', 'link' => "synkNav().setModule('dashboard').go();");
-
+	public function addMenu($title, $link) {
+		$this->menus[] = array('title' => $title, 'link' => $link);
+	}
+	
+	private function loadMenus()
+	{					
 		foreach($this->modules as $module) 
 		{
 			if (is_null($module->menu))
@@ -442,6 +444,7 @@ class Context {
 	
 	public function render() 
 	{
+		//echo "menus...";var_dump($this->menus); die();
 		$layoutTemplate = '';
 		
 		if (!is_null($this->controller)) {

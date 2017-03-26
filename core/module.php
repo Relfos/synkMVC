@@ -24,17 +24,13 @@ class Module
 		if (is_null($this->permCallback)) {
 			return true;
 		}
-		
-		if (is_null($context->user)) {
-			return false;
-		}
-			
+				
 		if (is_null($action)) {
 			return false;
 		}
 
 		$callback = $this->permCallback;
-		return $callback($context->user, $this, $action);
+		return $callback($context, $this, $action);
 	}
 		
     public function setDefaultAction($action) {		

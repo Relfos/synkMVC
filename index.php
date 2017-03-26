@@ -3,16 +3,13 @@
 
 require_once('core/init.php');
 
-$checkPerm = function($user, $module, $action) {
-	if ($module->name == 'users' && !$user->admin)	{
-		return false;
-	}
-		
-	return true;
+$checkPerm = function($context, $module, $action) {	
+	return $context->hasLogin;
 };
 
 $context = new Context();
 
+$context->addMenu("Dashboard", "synkNav().setModule('dashboard').go();");
 $context->createModule('auth');
 $context->createModule('dashboard')->setPermissions($checkPerm);
 $context->createModule('clients')->setMenu('Modulos')->setPermissions($checkPerm)->setDefaultAction('grid')->setEntity('client');
