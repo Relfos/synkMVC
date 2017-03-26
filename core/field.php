@@ -143,19 +143,20 @@ class Field
 	{
 		$this->dbType = "tinyint(1)";
 		$this->defaultValue = '0';
+		$this->formType = "checkbox";
 		return $this;
 	}
 
 	function asEmail()
 	{
 		$this->formType = 'email';
-		$this->defaultValue = 'Portugal';
 		return $this->asString(40);
 	}
 
 	function asCountry()
 	{		
 		$this->asEnum('country');
+		$this->defaultValue = 'PT';
 		return $this;
 	}
 

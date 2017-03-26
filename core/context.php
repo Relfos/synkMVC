@@ -1,5 +1,4 @@
 <?php
-
 class Context {
     public $hasLogin = false;  
 	public $isDownload = false;
@@ -10,6 +9,8 @@ class Context {
 	public $user = null;
 	
 	public $text = null;
+	
+	private $menus = array();
 	
 	function __construct() {
 		$this->hasLogin = isset($_SESSION['user_id']);
@@ -86,14 +87,18 @@ class Context {
 			$this->changeModule('settings');	
 			return;
 		}			
-	
-		$module = $this->loadVar('module', $this->config->defaultModule);
+
+		$module = $this->loadVarFromRequest('module', $this->config->defaultModule);
+		if ($module == 'current') {
+			$module = $_SESSION['module'];
+		}
+		
 		$this->changeModule($module);
 		
 		$view = $this->loadVar('view', $this->module->defaultAction);
 				
 		if ($this->hasLogin && $this->module->name == 'auth' && $this->curView == $this->module->defaultAction && $action != 'logout') {
-			$this->changeModule('dashboard');
+			$this->changeModule($this->config->defaultModule);
 		}
 				
 		if (!$this->module->hasAccess($this, $view))
@@ -106,7 +111,7 @@ class Context {
 			$this->changeView($view);		
 			$this->filter = $this->loadVar('filter', null);	
 		}							
-		
+
 		if (!file_exists('.htaccess'))
 		{
 			$htaccessData = "RewriteEngine on\n";
@@ -115,7 +120,16 @@ class Context {
 				$htaccessData .= "RewriteRule $name index.php?module=$name\n";
 			}
 			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*)\/(\d*) index.php?module=$2&action=api&call=$3&id=$4 [QSA,L]'."\n";
-			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*) index.php?module=$2&action=api&call=$3 [QSA,L]'."\n";		
+			$htaccessData .= 'RewriteRule ^(api)\/(\w+)\/(\w*) index.php?module=$2&action=api&call=$3 [QSA,L]'."\n";
+			//Determine the RewriteBase automatically/dynamically
+			$htaccessData .= 'RewriteCond $0#%{REQUEST_URI} ^([^#]*)#(.*)\1$'."\n";
+			$htaccessData .= 'RewriteRule ^.*$ - [E=BASE:%2]'."\n";
+			//if request is not for a file
+			$htaccessData .= 'RewriteCond %{REQUEST_FILENAME} !-d'."\n";
+			//if request is not for a directory
+			$htaccessData .= 'RewriteCond %{REQUEST_FILENAME} !-f'."\n";
+			//forward it to 404.php in current directory
+			$htaccessData .= 'RewriteRule . %{ENV:BASE}/404.php [L]'."\n";	
 			file_put_contents('.htaccess', $htaccessData);
 		}
 		
@@ -149,6 +163,10 @@ class Context {
 
 		ob_start();
 		$this->runController($action);
+		$this->terminate();
+	}
+	
+	private function terminate() {
 		$html = ob_get_contents();
 		ob_end_clean();
 
@@ -165,7 +183,7 @@ class Context {
 		else
 		{
 			echo $html;
-		}		
+		}				
 	}
 	
 	private function runController($action)
@@ -205,7 +223,7 @@ class Context {
 		}
 		else
 		{
-			echo "Invalid action $action on controller ".$this->module->name;
+			$this->kill("Invalid action $action on controller ".$this->module->name);
 		}		
 	}
 	
@@ -232,9 +250,7 @@ class Context {
 	}
 	
 	function loadMenus()
-	{
-		$this->menus = array();
-		
+	{			
 		$this->menus[] = array('title' => 'Dashboard', 'link' => "synkNav().setModule('dashboard').go();");
 
 		foreach($this->modules as $module) 
@@ -297,8 +313,10 @@ class Context {
 	
 	function kill($error)
 	{
-		echo $error;
-		die();
+		$this->error = $error;		
+		$this->pushTemplate("404");	      		
+		$this->render();		
+		//$this->terminate();		die();
 	}
 	
 	function changeModule($module)
@@ -318,9 +336,11 @@ class Context {
 		$_SESSION['module'] = $module;		
 		$_SESSION['page'] = 1;
 		
+		$this->module = $modules[$module];
+		
 		$this->removeFilters();
 		
-		$this->changeView($this->module->defaultAction);
+		$this->changeView($this->module->defaultAction);	
 	}
 
 	function changeView($view)
@@ -361,12 +381,7 @@ class Context {
 	{
 		if (isset($_REQUEST[$name]))
 		{
-			$result = $_REQUEST[$name];	
-			
-			if (strcmp($result, 'current') !=0)
-			{
-				return $result;	
-			}			
+			return $_REQUEST[$name];
 		}
 
 		if (isset($_SESSION[$name]))
@@ -424,8 +439,44 @@ class Context {
 			file_put_contents($this->config->logFile, "$text\n", FILE_APPEND | LOCK_EX);				
 		}
 	}
+	
+	public function render() 
+	{
+		$layoutTemplate = '';
 		
-	public function sendDownload($fileName, $data, $mimeType)
+		if (!is_null($this->controller)) {
+			$this->controller->beforeRender($this);
+		}
+		//var_dump($context->templateStack); die();
+
+		$total = count($this->templateStack);
+		for ($i=$total-1; $i>=0; $i--)
+		{			
+			$fileName = 'views/'.$this->templateStack[$i].'.html';
+			
+			if (file_exists($fileName))
+			{
+				$body = file_get_contents($fileName);
+			}
+			else
+			{
+				$layoutTemplate = "Error loading $fileName, the file was not found!";
+				break;
+			}
+			
+			
+			$layoutTemplate = str_replace('$body', $layoutTemplate, $body);	
+		}
+						
+		if (!is_null($this->controller)) {
+			$this->controller->afterRender($this, $layoutTemplate);
+		}
+		
+		$m = new Mustache_Engine;
+		echo $m->render($layoutTemplate, $this);	
+	}
+	
+	public function sendDownload($fileName, $data, $mimeType) 
 	{
 		$this->isDownload = true;
 		

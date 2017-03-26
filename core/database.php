@@ -43,6 +43,10 @@ abstract class DatabasePlugin
 		{
 			$user->name = $context->config->defaultUser;
 			$user->hash = $this->getPasswordHash($context->config->defaultPass);
+			
+			if (method_exists($user, 'initFirstUser')) {
+				$user->initFirstUser($context);
+			}
 						
 			if ($context->config->instanced)
 			{

@@ -7,7 +7,9 @@ error_reporting(E_ALL);
 //error_reporting(E_ERROR | E_PARSE);
 
 $sessionPath = getcwd(). '/tmp';
-mkdir($sessionPath);
+if (!file_exists($sessionPath)) {
+	mkdir($sessionPath);
+}
 ini_set('session.save_path', $sessionPath);
 session_start();
 

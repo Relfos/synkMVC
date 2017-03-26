@@ -27,8 +27,13 @@ class AuthController extends Controller {
 	   
 	   if ($this->checkPassword($password, $row['hash']))
 	   {
-			$context->logIn($row['id'], $row['database']);
-			$context->changeModule('dashboard');
+			if ($context->config->instanced) {
+				$dbName = $row['database'];
+			} else {
+				$dbName = $context->config->database;
+			}
+			$context->logIn($row['id'], $dbName);
+			$context->changeModule($context->config->defaultModule);
 			$context->reload();
 	   }
 	   else
@@ -42,11 +47,18 @@ class AuthController extends Controller {
    function logout($context)
    {
 		$context->logOut();
-		$context->changeModule('auth');		   
+		$context->changeModule($context->config->defaultModule);
 		$context->reload();
 		$this->render($context);
    }
 
+   function error404($context) 
+   {   
+		$context->pushTemplate("header");
+		$context->pushTemplate("body");
+		$context->kill("Ficheiro não encontrado");
+   }
+   
 } 
 
 

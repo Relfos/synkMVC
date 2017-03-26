@@ -21,11 +21,18 @@ class Controller {
 	   echo $progress;
    }
 
-   protected function beforeRender($context)
+   public function beforeRender($context)
    {
 	   
    }
    
+	public function afterRender($context, $layoutTemplate) 
+	{
+		if (strpos($layoutTemplate, '{{#grid.') !== false) {
+			$this->loadGrid($context);
+		}	   
+	}
+	   
    public function render($context)
    {
 		$viewFile = $context->curView;
@@ -39,44 +46,14 @@ class Controller {
 		
 		if (!file_exists('views/'. $viewPath.'.html'))
 		{
-			$layoutTemplate = "Could not load view '".$context->curView."' for ".$context->module->name;			
+			$context->kill("Could not load view '".$context->curView."' for ".$context->module->name);
+			return false;
 		}
-		else
-		{
-			$layoutTemplate = '';
-			$context->pushTemplate($viewPath);			
-		}
+
+		$context->pushTemplate($viewPath);			
 		      		
-		$layoutTemplate = '';
-	
-		$this->beforeRender($context);
-		//var_dump($context->templateStack); die();
-	  
-		$total = count($context->templateStack);
-		for ($i=$total-1; $i>=0; $i--)
-		{			
-			$fileName = 'views/'.$context->templateStack[$i].'.html';
-			
-			if (file_exists($fileName))
-			{
-				$body = file_get_contents($fileName);	
-			}
-			else
-			{
-				$layoutTemplate = "Error loading $fileName, the file was not found!";
-				break;
-			}
-			
-			
-			$layoutTemplate = str_replace('$body', $layoutTemplate, $body);	
-		}
-						
-		if (strpos($layoutTemplate, '{{#grid.') !== false) {
-			$this->loadGrid($context);
-		}	   
-		
-		$m = new Mustache_Engine;
-		echo $m->render($layoutTemplate, $context);	   
+		$context->render();
+		return true;
    }
 
    public function paginate($context)
@@ -143,8 +120,10 @@ class Controller {
 				$fieldName = $field->name;
 				$fieldValue = $entity->$fieldName;
 				$maskedValue = $fieldValue;
-				$required = $field->required;
+				$required = $field->required;				
 				$odd = ($i % 2) != 0;						
+				
+				$extra_attributes = ($field->formType=='checkbox' && $fieldValue=='1') ? 'checked="true"' : '';				
 				
 				if (strcmp($field->formType, 'file') == 0)
 				{
@@ -253,6 +232,7 @@ class Controller {
 					'class' => $field->formClass, 
 					'control' => $field->controlType, 
 					'required' => $required,
+					'extra_attributes' => $extra_attributes,
 					'options' => $options,
 					'odd' => $odd,
 					'entity' => $field->entity,
