@@ -10,3 +10,12 @@ RewriteRule ^connectors index.php?module=connectors
 RewriteRule ^settings index.php?module=settings
 RewriteRule ^(api)\/(\w+)\/(\w*)\/(\d*) index.php?module=$2&action=api&call=$3&id=$4 [QSA,L]
 RewriteRule ^(api)\/(\w+)\/(\w*) index.php?module=$2&action=api&call=$3 [QSA,L]
+# Determine the RewriteBase automatically/dynamically
+RewriteCond $0#%{REQUEST_URI} ^([^#]*)#(.*)\1$
+RewriteRule ^.*$ - [E=BASE:%2]
+# if request is not for a file
+RewriteCond %{REQUEST_FILENAME} !-d
+# if request is not for a directory
+RewriteCond %{REQUEST_FILENAME} !-f
+# forward it to 404.php in current directory
+RewriteRule . %{ENV:BASE}/404.php [L]
