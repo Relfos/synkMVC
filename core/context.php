@@ -249,8 +249,18 @@ class Context {
 		return $i;
 	}
 	
-	public function addMenu($title, $link) {
-		$this->menus[] = array('title' => $title, 'link' => $link);
+	public function addMenu($name, $link = null) {
+		if (is_null($link)) {			
+			$this->menus[] = array('title' => $name, 'items' => array());
+		} else {
+			$this->menus[] = array('title' => $name, 'link' => $link);
+		}
+		$index = $this->findMenuIndex($name);
+		return $index;
+	}
+	
+	public function addMenuLink($index, $label, $link) {
+		$this->menus[$index]['items'][] = array('label' => $label, 'link' => $link);
 	}
 	
 	private function loadMenus()
@@ -272,7 +282,7 @@ class Context {
 			}
 
 			$index = $this->findMenuIndex($module->menu);
-			$this->menus[$index]['items'][] = array('label' => $module->getTitle($this), 'link' => $link);
+			$this->menus[$index]['items'][] = array('label' => $module->getTitle($this), 'action' => $link, 'link' => '#');
 		}				
 	}
 	
