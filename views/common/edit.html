@@ -23,6 +23,9 @@
 						<div class="input-group col-xs-12" id="item_{{name}}_{{id}}">
 							<li class="list-group-item">{{label}}</li>
 							<span class="input-group-btn">
+								{{#thumb}}
+								<img src="data:image/jpeg;base64,{{thumb}}" class="list_thumb" />
+								{{/thumb}}
 								<button class="btn btn-danger btn-remove" type="button" onclick="delete_{{name}}_item({{id}})">
 									<span class="glyphicon glyphicon-minus"></span>
 								</button>
@@ -42,6 +45,7 @@
 			<script> 			
 			var item_{{name}} = "0";
 			var label_{{name}} = "";
+			var thumb_{{name}} = null;
 								
 			{{#isTable}}
 			function delete_{{name}}_item(value){
@@ -93,6 +97,14 @@
 				var span = document.createElement("span");
 				span.classList.add('input-group-btn');
 				div.appendChild(span);
+				
+				var thumb = thumb_{{name}};
+				if (thumb) {
+					var img = document.createElement("img");
+					img.setAttribute('src', thumb);
+					img.classList.add('list_thumb');
+					span.appendChild(img);
+				}
 						
 				var btn = document.createElement("button");
 				btn.setAttribute("type", "button");
@@ -129,6 +141,7 @@
 					{{#isTable}}
 					item_{{name}} = item.value;
 					label_{{name}} = item.label;
+					if (item.thumb) { thumb_{{name}} = item.thumb; }
 					{{/isTable}}
 
 					{{^isTable}}
@@ -183,7 +196,7 @@
 				
 				{{^isUpload}}
 				<{{control}} type="{{type}}" class="form-control {{class}}" name="{{name}}" id="{{name}}" {{^hasContent}}value="{{value}}"{{/hasContent}} 
-				rows=3 {{#required}}required data-required-error="Este campo é obrigatório."{{/required}}>{{#hasContent}}{{value}}{{/hasContent}}</{{control}}>
+				rows=3 {{extra_attributes}} {{#required}}required data-required-error="Este campo é obrigatório."{{/required}}>{{#hasContent}}{{value}}{{/hasContent}}</{{control}}>
 				{{/isUpload}}
 			{{/options.0}}
 			

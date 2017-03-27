@@ -155,7 +155,12 @@ class ModelController extends Controller {
 			}
 			
 			$name = $entity->name;
-			echo '{"label" :"'.$name.'", "value": "'.$entity->id.'"}';
+			echo '{"label" :"'.$name.'", "value": "'.$entity->id;
+			$thumb = $entity->toImage();
+			if (!is_null($thumb)){
+				echo '", "thumb": "data:image/jpeg;base64,'.$thumb;
+			}
+			echo '"}';
 			$i++;
 		}
 		echo ']';

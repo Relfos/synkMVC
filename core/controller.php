@@ -135,6 +135,10 @@ class Controller {
 					else {
 						$thumb = null;
 					}
+					
+					if (is_null($thumb)) {
+						$maskedValue = '-';
+					}
 				}
 				else
 				{
@@ -195,7 +199,8 @@ class Controller {
 								break;
 							}
 							$otherEntity = $context->database->fetchEntityByID($context, $field->entity, $id);	
-							$items[] = array("id" => $id, "label" => $otherEntity->toString());
+							$otherThumb = $otherEntity->toImage();
+							$items[] = array("id" => $id, "label" => $otherEntity->toString(), "thumb" => $otherThumb);
 						}
 						
 						$maskedValue = '';

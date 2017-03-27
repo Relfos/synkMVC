@@ -100,14 +100,15 @@ class Entity
 			if ($field->formType == 'file')
 			{
 				$fieldValue = $this->$fieldName;
-				
-				
-				$upload = $context->database->fetchEntityByID($context, "upload", $fieldValue);
-
-				//var_dump($upload->thumb); die();
-				
 				$fieldData = $fieldName.'_thumb';				
-				$this->$fieldData = $upload->thumb;
+
+				if ($fieldValue != '0') {
+					$upload = $context->database->fetchEntityByID($context, "upload", $fieldValue);
+					//var_dump($upload->thumb); die();
+					$this->$fieldData = $upload->thumb;
+				} else {
+					$this->$fieldData = null;
+				}
 			}
 		}				
 	}
@@ -182,6 +183,11 @@ class Entity
 		$className = get_class($this);
 		return $className;
 	}
+	
+	public function toImage() {		
+		return null;
+	}
+	
 }
 
 ?>

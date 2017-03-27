@@ -9,7 +9,7 @@
 	</div>
 	{{/grid.pages.0}}
 
-	<div class="table-responsive">
+	<div class="table-responsive synk_grid">
 		<table class="table table-hover">
 		 <thead>
 		  <tr>
@@ -38,7 +38,7 @@
 					{{/visible}}
 				{{/columns }}	
 
-				<td><a href="#" onclick="editEntity('{{rowID}}');" class="btn btn-theme small_btn">{{text.grid_action_edit}}</a></td>
+				<td><a href="#" onclick="editEntity('{{rowID}}');" class="btn btn-primary small_btn">{{text.grid_action_edit}}</a></td>
 			  </tr>
 			{{/grid.rows}}
 		 
@@ -48,15 +48,15 @@
 
 	<div class="col-md-12 text-center">		
 		<form role="form" id="controls_form">
-		<button type="button" class="btn btn-theme" onclick="editEntity(0)">{{text.grid_action_create}}</button>
+		<button type="button" class="btn btn-primary" onclick="editEntity(0)">{{text.grid_action_create}}</button>
 
 		{{#grid.exports.0}}
-		<button type="button" class="btn btn-theme dropdown-toggle" data-toggle="modal" data-target="#exportModal">{{text.grid_action_export}}</button>
+		<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="modal" data-target="#exportModal">{{text.grid_action_export}}</button>
 		{{/grid.exports.0}}
 		
-		<button type="button" class="btn btn-theme" data-toggle="modal" data-target="#searchModal">{{text.grid_action_filter}}</button>
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#searchModal">{{text.grid_action_filter}}</button>
 		{{#filter}}
-		<button type="button" class="btn btn-theme" onclick="synkNav().setAction('unfilter').go();">{{text.grid_action_unfilter}}</button>
+		<button type="button" class="btn btn-primary" onclick="synkNav().setAction('unfilter').go();">{{text.grid_action_unfilter}}</button>
 		{{/filter}}
 		</form>
 	</div>
@@ -78,7 +78,7 @@
 			<table class="table table-hover">		
 				{{#grid.exports}}
 				<tr><td class="col-xs-8">{{label}}</td>
-				<td class="col-xs-4"><a href="#" onclick="synkNav().setProgressBar('exportProgress').setAction('export').setArgs('format={{format}}&class={{module.entity}}').download();" class="btn btn-theme small_btn">Exportar</a></td>
+				<td class="col-xs-4"><a href="#" onclick="synkNav().setProgressBar('exportProgress').setAction('export').setArgs('format={{format}}&class={{module.entity}}').download();" class="btn btn-primary small_btn">Exportar</a></td>
 				{{/grid.exports}}
 			</table>
 			<div class="progress">
@@ -87,7 +87,7 @@
 			
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-theme" data-dismiss="modal">{{text.grid_action_close}}</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal">{{text.grid_action_close}}</button>
 		  </div>
 		</div>
 
@@ -160,8 +160,8 @@
 			
 		  </div>
 		  <div class="modal-footer">
-		  <button type="button" class="btn btn-theme" onclick="searchEntity()">{{text.grid_action_search}}</button>
-			<button type="button" class="btn btn-theme" data-dismiss="modal">{{text.grid_action_close}}</button>
+		  <button type="button" class="btn btn-primary" onclick="searchEntity()">{{text.grid_action_search}}</button>
+			<button type="button" class="btn btn-primary" data-dismiss="modal">{{text.grid_action_close}}</button>
 		  </div>
 		</div>
 
@@ -170,10 +170,10 @@
 {{/grid.rows.0}}
 
 {{^grid.rows.0}}
-<p>{{grid.error}}</p>
+<p class='synk_grid text-center'>{{grid.error}}</p>
 	<div class="col-md-12 text-center">		
 		<form role="form" id="controls_form">
-		<button type="button" class="btn btn-theme" onclick="editEntity(0)">{{text.grid_action_create}}</button>
+		<button type="button" class="btn btn-primary" onclick="editEntity(0)">{{text.grid_action_create}}</button>
 	</div>
 {{/grid.rows.0}}
 
@@ -192,11 +192,11 @@
 			
 		  </div>
 		  <div class="modal-footer">
-			<button type="button" class="btn btn-theme" onclick="saveEntity(currentEntityID, '{{module.entity}}');">{{#grid.rows.0}}{{text.grid_action_save}}{{/grid.rows.0}}{{^grid.rows.0}}{{text.grid_action_create}}{{/grid.rows.0}}</button>
+			<button type="button" class="btn btn-primary" onclick="saveEntity(currentEntityID, '{{module.entity}}');">{{#grid.rows.0}}{{text.grid_action_save}}{{/grid.rows.0}}{{^grid.rows.0}}{{text.grid_action_create}}{{/grid.rows.0}}</button>
 			{{#grid.rows.0}}
-			<button type="button" class="btn btn-theme" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">{{text.grid_action_delete}}</button>
+			<button type="button" class="btn btn-primary" onclick="deleteEntity(currentEntityID, '{{module.entity}}')">{{text.grid_action_delete}}</button>
 			{{/grid.rows.0}}
-			<button type="button" class="btn btn-theme" onclick="$('#editModal').modal('hide');	">{{text.grid_action_cancel}}</button>
+			<button type="button" class="btn btn-primary" onclick="$('#editModal').modal('hide');	">{{text.grid_action_cancel}}</button>
 		  </div>
 		</div>
 
