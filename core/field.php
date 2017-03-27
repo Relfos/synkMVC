@@ -143,6 +143,7 @@ class Field
 	{
 		$this->dbType = "tinyint(1)";
 		$this->defaultValue = '0';
+		$this->required = false;
 		$this->formType = "checkbox";
 		return $this;
 	}
